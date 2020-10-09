@@ -1,3 +1,11 @@
 # PolyHash 2020
+============
 
-Sviatoslav Besnard
+TODO description
+
+# La team
+===========
+* Sviatoslav BESNARD
+* Aurelie BOULAIS
+* Chama EL MAJENY
+* Remy BORIUS
