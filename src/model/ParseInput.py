@@ -8,15 +8,23 @@ class ParseInput:
 
     grille: Grille
 
+
     def __init__(self):
         pass
 
+    def crea
 
     def parse(self, file_path: str) -> Grille:
         """parse le fichier google et retourne la Grille correspondante"""
 
+        file_path = '/polyhash-2020/data/input/' + input('Entrer le nom du fichier à tester')
         # test si file_path est un fichier
         assert os.path.isfile(file_path)
+
+        with open(file_path, 'r') as file:
+            line = file.readline()
+
+
 
         # TODO : récupérer toutes les lignes du fichiers
 
@@ -37,4 +45,3 @@ class ParseInput:
         # l'instancier et la mettre dans la grille (et ne pas oublier de l'associer à la tâche)
 
         return self.grille
-
