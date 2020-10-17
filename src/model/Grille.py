@@ -17,7 +17,7 @@ class Grille:
 
     step_simulation: int = 0
 
-    # cases[y][x]
+    # cases[y][x] : y est la hauteur et x la largeur
     cases: List
 
     robots: List
@@ -33,11 +33,11 @@ class Grille:
         self.point_montages = []
 
         # init cases
-        cases = []
+        self.cases = []
         for idx_ligne in range(hauteur):
-            cases.append([])
+            self.cases.append([])
             for idx_colone in range(longueur):
-                cases[idx_ligne].append([])
+                self.cases[idx_ligne].append([])
 
     def start_simulation(self):
         """Lance la simulation
@@ -64,24 +64,41 @@ class Grille:
         """
 
         assert point_montage is not None
+        # vérifier si la case est vide
+        assert len(self.cases[point_montage.y][point_montage.x]) == 0
 
-        # TODO add_point_montage
+        self.cases[point_montage.y][point_montage.x].append(point_montage)
+        self.point_montages.append(point_montage)
+
         return self
 
-    def add_etape(self, tache: Tache):
+    def add_tache(self, tache: Tache):
         """Ajoute l'etape à la grille
 
-        Place l'étape dans casesèk.
+        Place l'étape dans cases.
         Si il y a déjà une étape aux coordonnées de la nouvelle étape,
         ne rien faire.
 
-        :param point_montage: Le point de montage à ajouter
+        :param tache: La tache à ajouter
         :return: Grille
         """
 
         assert tache is not None
+        assert len(tache.etapes) > 0
 
-        # TODO add_etape
+
+        for etape in tache.etapes :
+
+            for item in self.cases[etape.y][etape.x] :
+                # si il y a un point de montage alors error
+                if isinstance(item, PointMontage) :
+                    raise ValueError
+                # si il n'y a pas déjà d'étapes dans la case alors on l'ajoute
+                elif not isinstance(item, Etape):
+                    self.cases[etape.y][etape.x].append(etape)
+
+            self.taches.append(etape)
+
         return self
 
     def __str__(self):
