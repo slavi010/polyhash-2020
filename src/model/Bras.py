@@ -1,4 +1,3 @@
-from src.model.Grille import Grille
 from src.model.ItemCase import ItemCase
 from src.model.Robot import Robot
 
@@ -8,7 +7,7 @@ class Bras(ItemCase):
 
     robot: Robot
 
-    def __init__(self, x: int, y: int, grille: Grille, robot: Robot):
+    def __init__(self, x: int, y: int, robot: Robot):
         """
 
         :param x: position x
@@ -16,6 +15,6 @@ class Bras(ItemCase):
         :param grille: la grille de cette item
         :param robot: Le robot au quel ce morceau de bras est attaché
         """
-        super().__init__(x, y, grille)
+        super().__init__(x, y)
         self.robot = robot
 

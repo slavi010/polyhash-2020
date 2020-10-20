@@ -13,7 +13,10 @@ class ParseInput:
 
 
     def parse(self, file_path: str) -> Grille:
-        """parse le fichier google et retourne la Grille correspondante"""
+        """parse le fichier google et retourne la Grille correspondante
+
+        :rtype: Grille
+        """
 
         # test si file_path est un fichier
         assert os.path.isfile(file_path)

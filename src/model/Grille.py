@@ -3,7 +3,6 @@ from typing import List
 from src.model.Bras import Bras
 from src.model.Etape import Etape
 from src.model.PointMontage import PointMontage
-from src.model.Robot import Robot
 from src.model.Tache import Tache
 
 
@@ -44,13 +43,17 @@ class Grille:
 
         Va dérouler l'algo de chaque robot à chaque instant t.
         """
+        pass
 
     def one_step_simulation(self):
         """Avance la simulation à t+1
 
         Pour chaque Robot, fait bouger son bras avec son prochain mouvement.
-        Si pas de prochain mouvement -> raise Error
-        Si pas 
+        Si pas de prochain mouvement dans un des bras -> raise Error
+        Si collision (ou bras hors grille) -> raise Error
+        Actualise les taches actuelles (supprime les étapes de la tâche du robot au fur et à mesure)
+        Si une tâche n'a plus d'étape, ajoute les points de la tâche et supprime la tâche du robot.
+
         """
 
 
