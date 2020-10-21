@@ -3,7 +3,6 @@ from typing import List
 from src.model.Bras import Bras
 from src.model.Etape import Etape
 from src.model.PointMontage import PointMontage
-from src.model.Robot import Robot
 from src.model.Tache import Tache
 
 
@@ -24,9 +23,13 @@ class Grille:
     taches: List
     point_montages: List
 
+    points: int
+
     def __init__(self, longueur: int, hauteur: int):
         self.longueur = longueur
         self.hauteur = hauteur
+
+        self.points = 0
 
         self.robots = []
         self.taches = []
@@ -43,15 +46,64 @@ class Grille:
         """Lance la simulation
 
         Va dérouler l'algo de chaque robot à chaque instant t.
+
+        Doit vérifier que les robots ont finis toutes leurs taches.
         """
+
+        while self.step_simulation > 0:
+            self.one_step_simulation()
+
+        # vérifie les taches des robots
+        for robot in self.robots:
+            if len(robot.taches):
+                raise ValueError("Une tâche assignée n'est pas finie !!!")
 
     def one_step_simulation(self):
         """Avance la simulation à t+1
 
         Pour chaque Robot, fait bouger son bras avec son prochain mouvement.
-        Si pas de prochain mouvement -> raise Error
-        Si pas 
+        Si pas de prochain mouvement dans un des robots -> raise Error
+        Si collision (ou bras hors grille) -> raise Error
+        Si step_simulation == 0 -> raise Error
+        Actualise les taches actuelles (supprime les étapes de la tâche du robot au fur et à mesure)
+        Si une tâche n'a plus d'étape, ajoute les points de la tâche et supprime la tâche du robot.
+
         """
+
+        if not self.step_simulation:
+            raise ValueError("La simulation est finie !")
+        self.step_simulation -= 1
+
+        # vérifie si chaque robot a au moins un mouvement
+        for robot in self.robots:
+            if not len(robot.mouvements):
+                raise AttributeError("Un robot n'a pas de prochain mouvement !")
+
+        robots = self.robots.copy()
+        # fait bouger chaque robot avec des mouvements de rétractation
+        for robot in self.robots:
+            if robot.faire_prochain_mouvement_retractation(self):
+                robots.remove(robot)
+
+        # fait bouger tous les autres robots
+        for robot in robots:
+            robot.faire_prochain_mouvement(self)
+
+    def dans_grille(self, x: int, y: int):
+        """Retourne Vrai si les coordonnées sont dans la grille
+
+        Faux sinon
+
+        :param x: La coordonnée x
+        :type: int
+        :param y: La coordonnée y
+        :type: int
+        :return: Vrai sin les coordonnées sont dans la grille
+        :rtype: bool
+        """
+        return 0 <= x < self.longueur and \
+            0 <= y < self.hauteur
+
 
 
     def add_point_montage(self, point_montage: PointMontage):

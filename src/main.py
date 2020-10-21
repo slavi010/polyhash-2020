@@ -5,7 +5,8 @@
     Module d'entrée pour la mise en oeuvre du projet Poly#.
 """
 
-from polyhash import solve
+# from polyhash import solve
  
 if __name__ == "__main__":
-    solve()
+    # solve()
+    pass

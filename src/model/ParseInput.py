@@ -15,7 +15,10 @@ class ParseInput:
     def crea
 
     def parse(self, file_path: str) -> Grille:
-        """parse le fichier google et retourne la Grille correspondante"""
+        """parse le fichier google et retourne la Grille correspondante
+
+        :rtype: Grille
+        """
 
         file_path = '/polyhash-2020/data/input/' + input('Entrer le nom du fichier à tester')
         # test si file_path est un fichier
