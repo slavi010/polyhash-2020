@@ -1,3 +1,6 @@
+from src.model.Mouvement import Mouvement
+
+
 class ItemCase:
     """Un élément dans la grille"""
 
@@ -17,6 +20,28 @@ class ItemCase:
 
         self.x = x
         self.y = y
+
+    def get_position(self, mouvement: Mouvement = None):
+        """Retourner les coordonnées x et y après application d'un mouvement.
+
+        :param mouvement: Le mouvement appliqué
+        :type: Mouvement
+        :return: x, y
+
+        """
+        if mouvement is None:
+            return self.x, self.y
+        else:
+            if mouvement == Mouvement.HAUT:
+                return self.x, self.y + 1
+            elif mouvement == Mouvement.DROITE:
+                return self.x + 1, self.y
+            elif mouvement == Mouvement.BAS:
+                return self.x, self.y - 1
+            elif mouvement == Mouvement.GAUCHE:
+                return self.x - 1, self.y + 1
+            else:
+                raise ValueError("Mouvement non reconnu !")
 
     def __eq__(self, other):
         """Retourne vrai si cette instance et other sont à la même place dans la même grille
