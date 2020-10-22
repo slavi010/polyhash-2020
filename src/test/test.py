@@ -95,7 +95,7 @@ def robot_faire_prochain_mouvement_test():
 
     robot = Robot()
     robot.point_montage = point_montage
-    robot.taches.append(tache)
+    robot.add_tache(tache)
     robot.mouvements.append(Mouvement.HAUT)
     robot.mouvements.append(Mouvement.DROITE)
     grille.robots.append(robot)
@@ -116,10 +116,6 @@ def robot_faire_prochain_mouvement_test():
         pass
     else:
         assert False
-
-
-
-
 
 
 def robot_coordonnees_pince_test():
@@ -149,6 +145,38 @@ def grille_dans_grille_test():
     assert not grille.dans_grille(10, 5)
 
 
+def robot_add_tache_test():
+    grille = Grille(10, 10)
+    point_montage = PointMontage(5, 5)
+    etape_1 = Etape(5, 6)
+    etape_2 = Etape(5, 7)
+    tache = Tache(15)
+    tache.add_etape(etape_1)
+    tache.add_etape(etape_2)
+    grille.add_tache(tache)
+    robot = Robot()
+    robot.point_montage = point_montage
+    robot.add_tache(tache, grille)
+
+    assert len(robot.taches)
+    assert not len(grille.taches)
+
+
+def robot_get_plus_proche_tache_test():
+    grille = Grille(10, 10)
+    point_montage = PointMontage(5, 5)
+    etape_1 = Etape(5, 6)
+    etape_2 = Etape(5, 7)
+    tache = Tache(15)
+    tache.add_etape(etape_1)
+    tache.add_etape(etape_2)
+    grille.add_tache(tache)
+    robot = Robot()
+    robot.point_montage = point_montage
+    robot.add_tache(robot.get_plus_proche_tache(grille), grille)
+    assert not robot.get_plus_proche_tache(grille)
+
+
 def grill_start_simulation_test():
     grille = Grille(10, 10)
     grille.step_simulation = 2
@@ -166,7 +194,7 @@ def grill_start_simulation_test():
 
     robot = Robot()
     robot.point_montage = point_montage
-    robot.taches.append(tache)
+    robot.add_tache(tache)
     robot.mouvements.append(Mouvement.HAUT)
     robot.mouvements.append(Mouvement.HAUT)
     grille.robots.append(robot)

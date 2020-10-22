@@ -39,7 +39,9 @@ class ItemCase:
             elif mouvement == Mouvement.BAS:
                 return self.x, self.y - 1
             elif mouvement == Mouvement.GAUCHE:
-                return self.x - 1, self.y + 1
+                return self.x - 1, self.y
+            elif mouvement == Mouvement.ATTENDRE:
+                return self.x, self.y
             else:
                 raise ValueError("Mouvement non reconnu !")
 

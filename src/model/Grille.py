@@ -47,16 +47,18 @@ class Grille:
 
         Va dérouler l'algo de chaque robot à chaque instant t.
 
-        Doit vérifier que les robots ont finis toutes leurs taches.
+        Doit vérifier que les robots ont finis toutes leurs taches et mouvement.
         """
 
         while self.step_simulation > 0:
             self.one_step_simulation()
 
-        # vérifie les taches des robots
+        # vérifie les taches et mouvement des robots
         for robot in self.robots:
             if len(robot.taches):
                 raise ValueError("Une tâche assignée n'est pas finie !!!")
+            if len(robot.mouvements):
+                raise ValueError("Il reste des mouvements au robot !!!")
 
     def one_step_simulation(self):
         """Avance la simulation à t+1
@@ -138,18 +140,19 @@ class Grille:
         assert tache is not None
         assert len(tache.etapes) > 0
 
-
-        for etape in tache.etapes :
-
-            for item in self.cases[etape.y][etape.x] :
+        for etape in tache.etapes:
+            deja_etape = False
+            for item in self.cases[etape.y][etape.x]:
                 # si il y a un point de montage alors error
-                if isinstance(item, PointMontage) :
-                    raise ValueError
+                if isinstance(item, PointMontage):
+                    raise ValueError("Il ya déjà un point de montage à la case, ajout de l'étape impossible")
                 # si il n'y a pas déjà d'étapes dans la case alors on l'ajoute
-                elif not isinstance(item, Etape):
-                    self.cases[etape.y][etape.x].append(etape)
+                elif isinstance(item, Etape):
+                    deja_etape = True
+            if not deja_etape:
+                self.cases[etape.y][etape.x].append(etape)
 
-            self.taches.append(etape)
+        self.taches.append(tache)
 
         return self
 
@@ -160,7 +163,7 @@ class Grille:
         :rtype : str
         """
         map: str = ""
-        for y in range(self.hauteur):
+        for y in range(self.hauteur-1, -1, -1):
             for x in range(self.longueur):
                 if len(self.cases[y][x]) > 0:
                     if isinstance(self.cases[y][x][0], PointMontage):
@@ -172,3 +175,4 @@ class Grille:
                 else:
                     map += "."
             map += "\n"
+        return map

@@ -6,7 +6,7 @@
 """
 
 # from polyhash import solve
- 
+from src.model.ParseInput import ParseInput
+
 if __name__ == "__main__":
-    # solve()
-    pass
+    grille = ParseInput().parse("data/input/a_example.txt")
