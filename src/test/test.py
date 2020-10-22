@@ -194,7 +194,7 @@ def grill_start_simulation_test():
 
     robot = Robot()
     robot.point_montage = point_montage
-    robot.add_tache(tache)
+    robot.add_tache(tache,grille)
     robot.mouvements.append(Mouvement.HAUT)
     robot.mouvements.append(Mouvement.HAUT)
     grille.robots.append(robot)
