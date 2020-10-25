@@ -49,8 +49,8 @@ def grille_add_point_montage_test():
 
 def grille_add_tache_test():
     grille = Grille(10, 10)
-    tache_1 = Tache(4)
-    tache_2 = Tache(5)
+    tache_1 = Tache(4, 0)
+    tache_2 = Tache(5, 1)
 
     tache_1.add_etape(Etape(5, 6)).add_etape(Etape(6, 7))
     tache_2.add_etape(Etape(5, 6)).add_etape(Etape(8, 7))
@@ -90,12 +90,12 @@ def robot_faire_prochain_mouvement_test():
     grille.add_point_montage(point_montage_bis)
 
     etape = Etape(5, 6)
-    tache = Tache(15)
+    tache = Tache(15, 0)
     tache.add_etape(etape)
 
     robot = Robot()
     robot.point_montage = point_montage
-    robot.add_tache(tache)
+    robot.add_tache(tache, grille)
     robot.mouvements.append(Mouvement.HAUT)
     robot.mouvements.append(Mouvement.DROITE)
     grille.robots.append(robot)
@@ -150,7 +150,7 @@ def robot_add_tache_test():
     point_montage = PointMontage(5, 5)
     etape_1 = Etape(5, 6)
     etape_2 = Etape(5, 7)
-    tache = Tache(15)
+    tache = Tache(15, 0)
     tache.add_etape(etape_1)
     tache.add_etape(etape_2)
     grille.add_tache(tache)
@@ -167,7 +167,7 @@ def robot_get_plus_proche_tache_test():
     point_montage = PointMontage(5, 5)
     etape_1 = Etape(5, 6)
     etape_2 = Etape(5, 7)
-    tache = Tache(15)
+    tache = Tache(15, 0)
     tache.add_etape(etape_1)
     tache.add_etape(etape_2)
     grille.add_tache(tache)
@@ -177,7 +177,13 @@ def robot_get_plus_proche_tache_test():
     assert not robot.get_plus_proche_tache(grille)
 
 
-def grill_start_simulation_test():
+def mouvement_rotation_90_test():
+    mouvement = Mouvement.HAUT
+    assert mouvement.rotation_90() == Mouvement.DROITE
+    assert mouvement.rotation_90(2) == Mouvement.BAS
+    assert mouvement.rotation_90().rotation_90(2) == Mouvement.GAUCHE
+
+def grille_start_simulation_test():
     grille = Grille(10, 10)
     grille.step_simulation = 2
     point_montage = PointMontage(5, 5)
@@ -187,14 +193,14 @@ def grill_start_simulation_test():
 
     etape_1 = Etape(5, 6)
     etape_2 = Etape(5, 7)
-    tache = Tache(15)
+    tache = Tache(15, 0)
     tache.add_etape(etape_1)
     tache.add_etape(etape_2)
     grille.add_tache(tache)
 
     robot = Robot()
     robot.point_montage = point_montage
-    robot.add_tache(tache,grille)
+    robot.add_tache(tache, grille)
     robot.mouvements.append(Mouvement.HAUT)
     robot.mouvements.append(Mouvement.HAUT)
     grille.robots.append(robot)

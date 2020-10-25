@@ -62,10 +62,14 @@ class ParseInput:
             # Crée les instances Taches et Etapes
             for index_tache in range(lines[0][4]):
                 index += 1
-                tache_tampon: Tache = Tache(lines[index][0])
+                tache_tampon: Tache = Tache(lines[index][0], index_tache)
                 index += 1
                 for index_etape in range(lines[index-1][1]):
                     tache_tampon.add_etape(Etape(lines[index][index_etape*2+0], lines[index][index_etape*2+1]))
                 grille.add_tache(tache_tampon)
+
+                # calcul distance aproximative entre chaque étape
+                # for etape in tache_tampon.etapes:
+                #     tache_tampon.distance +=
 
             return grille

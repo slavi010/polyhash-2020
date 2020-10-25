@@ -77,6 +77,7 @@ class Robot:
             # collision ?
             for item in grille.cases[y_new][x_new]:
                 if isinstance(item, Bras) or isinstance(item, PointMontage):
+                    print(grille)
                     raise ConnectionError("COLLISION !!! x.x")
 
             # Tout est ok, ajoute une nouvelle extension de bras
@@ -152,3 +153,7 @@ class Robot:
                 tache_min = tache
 
         return tache_min
+
+    def __str__(self) -> str:
+        return "Robot: " + str(self.point_montage.x) + ", " + str(self.point_montage.y)
+

@@ -1,8 +1,10 @@
-from typing import List
+from typing import List, Union
 
 from src.model.Bras import Bras
 from src.model.Etape import Etape
+from src.model.ItemCase import ItemCase
 from src.model.PointMontage import PointMontage
+from src.model.Robot import Robot
 from src.model.Tache import Tache
 
 
@@ -156,6 +158,62 @@ class Grille:
 
         return self
 
+    def to_matrix(self, x1: int, y1: int, x2: int, y2: int, robot: Robot = None) -> List:
+        """Renvoie la grille sous forme d'une matrice.
+
+        0 pour un point de montage
+        -1 pour un bras d'autre robots (avec ou sons etape)
+        1 pour les bras du robot actuel (si lieu)
+        5 pour le vide
+        7 pour une etape
+
+        :param robot: Le point de vue du robot actuel (notamment pour la rétractation)
+        :return : La carte en deux dimenssions
+        :rtype : List
+        """
+        assert x1 <= x2
+        assert y1 <= y2
+
+        map: List = []
+        if robot is not None:
+            pince = robot.coordonnees_pince()
+
+        for y in range(y1, y2 + 1):
+            map.append([])
+            for x in range(x1, x2 + 1):
+                if x < 0 or x >= self.longueur or y < 0 or y >= self.hauteur:
+                    map[y - y1].append(-2)
+                else:
+                    if len(self.cases[y][x]) == 1:
+                        if isinstance(self.cases[y][x][0], PointMontage):
+                            map[y - y1].append(0)
+                        elif isinstance(self.cases[y][x][0], Bras):
+                            # le bras du robot ?
+                            ok = False
+                            if robot is not None \
+                                    and (pince == self.cases[y][x][0] or
+                                         (len(robot.bras) > 2 and self.cases[y][x][0] == robot.bras[-2]) or
+                                         (len(robot.bras) == 1 and self.cases[y][x][0] == robot.point_montage)):
+                                ok = True
+                                map[y - y1].append(1)
+                            if not ok:
+                                map[y - y1].append(-1)
+                        elif isinstance(self.cases[y][x][0], Etape):
+                            map[y - y1].append(7)
+                    elif len(self.cases[y][x]) == 2:
+                        ok = False
+                        if robot is not None \
+                                and (pince == self.cases[y][x][0] or
+                                  (len(robot.bras) > 2 and self.cases[y][x][0] == robot.bras[-2]) or
+                                  (len(robot.bras) == 1 and self.cases[y][x][0] == robot.point_montage)):
+                            ok = True
+                            map[y - y1].append(1)
+                        if not ok:
+                            map[y - y1].append(-1)
+                    else:
+                        map[y - y1].append(5)
+        return map
+
     def __str__(self):
         """Renvoie la grille sous forme d'un str représentant une carte
 
@@ -164,14 +222,19 @@ class Grille:
         """
         map: str = ""
         for y in range(self.hauteur-1, -1, -1):
-            for x in range(self.longueur):
-                if len(self.cases[y][x]) > 0:
+            map += str(y) + '\t'
+            for idx, x in enumerate(range(self.longueur)):
+                if idx % 10 == 0:
+                    map += " "
+                if len(self.cases[y][x]) == 1:
                     if isinstance(self.cases[y][x][0], PointMontage):
                         map += "O"
                     elif isinstance(self.cases[y][x][0], Bras):
-                        map += "#"
+                        map += "B"
                     elif isinstance(self.cases[y][x][0], Etape):
                         map += "x"
+                elif len(self.cases[y][x]) == 2:
+                    map += "#"
                 else:
                     map += "."
             map += "\n"
