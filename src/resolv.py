@@ -14,6 +14,7 @@ from src.model.ItemCase import ItemCase
 from src.model.Mouvement import Mouvement
 from src.model.PointMontage import PointMontage
 
+MAX_STUCK = 20
 
 def methode_naive(grille: Grille):
     """Une méthode très simple pour résoudre le problème"""
@@ -42,112 +43,137 @@ def methode_naive(grille: Grille):
                         if tache == prochaine_tache:
                             grille_solution.robots[idx_robot].add_tache(prochaine_tache, grille_solution)
 
-            prochain_mouvement: Mouvement
+            prochain_mouvement: Mouvement = Mouvement.ATTENDRE
             pince: ItemCase = robot.coordonnees_pince()
 
             if len(robot.taches):
-                # il y a un tâche à accomplir
-                # bouge vers l'etape correspondante
+                # toujours d'actu?
+                if len(robot.mouvements):
+                    # collision ?
+                    collision = False
+                    x_new, y_new = robot.coordonnees_pince().get_position(robot.mouvements[0])
 
-                x_diff: int = robot.taches[0].etapes[0].x - pince.x
-                y_diff: int = robot.taches[0].etapes[0].y - pince.y
-
-                if abs(x_diff) > abs(y_diff):
-                    # en x
-                    if x_diff > 0:
-                        prochain_mouvement = Mouvement.DROITE
-                    else:
-                        prochain_mouvement = Mouvement.GAUCHE
-                else:
-                    # en y
-                    if y_diff > 0:
-                        prochain_mouvement = Mouvement.HAUT
-                    else:
-                        prochain_mouvement = Mouvement.BAS
-
-                # collision ?
-                x_new, y_new = robot.coordonnees_pince().get_position(prochain_mouvement)
-
-                collision = False
-
-                # le prochain mouvement d'un autre bras a déjà réservé cette case ?
-                for idx_coordonnees in range(0, len(coordonnees_prochain_mouvement), 2):
-                    if x_new == coordonnees_prochain_mouvement[idx_coordonnees] and \
-                            y_new == coordonnees_prochain_mouvement[idx_coordonnees + 1]:
-                        collision = True
-                # om y a un bras ou un point de montage présent sur cette case ?
-                for item in grille_live.cases[y_new][x_new]:
-                    if isinstance(item, Bras) or isinstance(item, PointMontage):
-                        collision = True
-
-                if collision:
-                    prochain_mouvement = Mouvement.ATTENDRE
-                    # collision = False
-                    # x_new_colision, y_new_colision = robot.coordonnees_pince().get_position(
-                    #     prochain_mouvement.rotation_90())
-                    # # le prochain mouvement d'un autre bras a déjà réservé cette case ?
-                    # if not grille_live.dans_grille(x_new_colision, y_new_colision):
-                    #     collision = True
-                    # else:
-                    #     for idx_coordonnees in range(0, len(coordonnees_prochain_mouvement), 2):
-                    #         if x_new_colision == coordonnees_prochain_mouvement[idx_coordonnees] and \
-                    #                 y_new_colision == coordonnees_prochain_mouvement[idx_coordonnees + 1]:
-                    #             collision = True
-                    #     for item in grille_live.cases[y_new_colision][x_new_colision]:
-                    #         if isinstance(item, Bras) or isinstance(item, PointMontage):
-                    #             collision = True
-                    # if collision:
-                    #     collision = False
-                    #     x_new_colision, y_new_colision = robot.coordonnees_pince().get_position(
-                    #         prochain_mouvement.rotation_90(2))
-                    #     if not grille_live.dans_grille(x_new_colision, y_new_colision):
-                    #         collision = True
-                    #     else:
-                    #         for idx_coordonnees in range(0, len(coordonnees_prochain_mouvement), 2):
-                    #             if x_new_colision == coordonnees_prochain_mouvement[idx_coordonnees] and \
-                    #                     y_new_colision == coordonnees_prochain_mouvement[idx_coordonnees + 1]:
-                    #                 collision = True
-                    #         for item in grille_live.cases[y_new_colision][x_new_colision]:
-                    #             if isinstance(item, Bras) or isinstance(item, PointMontage):
-                    #                 collision = True
-                    #     if collision:
-                    #         prochain_mouvement = Mouvement.ATTENDRE
-                    #     else:
-                    #         prochain_mouvement = prochain_mouvement.rotation_90(2)
-                    #
-                    # else:
-                    #     prochain_mouvement = prochain_mouvement.rotation_90()
-
-                # recherche d'un chemin plus optimisé
-                if prochain_mouvement == Mouvement.ATTENDRE and random.randint(1, 1) == 1:
-                    x_min = (pince.x if pince.x < robot.taches[0].etapes[0].x else robot.taches[0].etapes[0].x) - 1
-                    y_min = (pince.y if pince.y < robot.taches[0].etapes[0].y else robot.taches[0].etapes[0].y) - 1
-                    x_max = (pince.x if pince.x >= robot.taches[0].etapes[0].x else robot.taches[0].etapes[0].x) + 1
-                    y_max = (pince.y if pince.y >= robot.taches[0].etapes[0].y else robot.taches[0].etapes[0].y) + 1
-                    matrix = grille_live.to_matrix(x_min, y_min, x_max, y_max, robot)
-                    # ajoute les prochains mouvements déjà programmé des autres bras
+                    # le prochain mouvement d'un autre bras a déjà réservé cette case ?
                     for idx_coordonnees in range(0, len(coordonnees_prochain_mouvement), 2):
-                        if x_min <= coordonnees_prochain_mouvement[idx_coordonnees] <= x_max and \
-                                y_min <= coordonnees_prochain_mouvement[idx_coordonnees + 1] <= y_max:
-                            matrix[coordonnees_prochain_mouvement[idx_coordonnees + 1] - y_min] \
-                                [coordonnees_prochain_mouvement[idx_coordonnees] - x_min] = -1
-                    grid = Grid(matrix=matrix)
-                    start = grid.node(pince.x - x_min, pince.y - y_min)
-                    end = grid.node(robot.taches[0].etapes[0].x - x_min, robot.taches[0].etapes[0].y - y_min)
-                    finder = AStarFinder(diagonal_movement=DiagonalMovement.never, time_limit=10)
-                    path, runs = finder.find_path(start, end, grid)
-                    # print(x_min, y_min, x_max, y_max)
-                    # print(grid.grid_str(path=path, start=start, end=end, show_weight=True))
+                        if x_new == coordonnees_prochain_mouvement[idx_coordonnees] and \
+                                y_new == coordonnees_prochain_mouvement[idx_coordonnees + 1]:
+                            collision = True
+                    # om y a un bras ou un point de montage présent sur cette case ?
+                    for item in grille_live.cases[y_new][x_new]:
+                        if isinstance(item, Bras) or isinstance(item, PointMontage):
+                            collision = True
 
-                    if len(path) > 1:
-                        if path[1][0] - pince.x + x_min < 0:
-                            prochain_mouvement = Mouvement.GAUCHE
-                        elif path[1][0] - pince.x + x_min > 0:
+                    if collision:
+                        robot.mouvements.clear()
+                    else:
+                        prochain_mouvement = robot.mouvements[0]
+
+                if not len(robot.mouvements) and robot.stucks < MAX_STUCK:
+                    # il y a un tâche à accomplir
+                    # bouge vers l'etape correspondante
+
+                    x_diff: int = robot.taches[0].etapes[0].x - pince.x
+                    y_diff: int = robot.taches[0].etapes[0].y - pince.y
+
+                    if abs(x_diff) > abs(y_diff):
+                        # en x
+                        if x_diff > 0:
                             prochain_mouvement = Mouvement.DROITE
-                        elif path[1][1] - pince.y + y_min < 0:
-                            prochain_mouvement = Mouvement.BAS
                         else:
+                            prochain_mouvement = Mouvement.GAUCHE
+                    else:
+                        # en y
+                        if y_diff > 0:
                             prochain_mouvement = Mouvement.HAUT
+                        else:
+                            prochain_mouvement = Mouvement.BAS
+
+                    # collision ?
+                    x_new, y_new = robot.coordonnees_pince().get_position(prochain_mouvement)
+
+                    collision = False
+
+                    # le prochain mouvement d'un autre bras a déjà réservé cette case ?
+                    for idx_coordonnees in range(0, len(coordonnees_prochain_mouvement), 2):
+                        if x_new == coordonnees_prochain_mouvement[idx_coordonnees] and \
+                                y_new == coordonnees_prochain_mouvement[idx_coordonnees + 1]:
+                            collision = True
+                    # om y a un bras ou un point de montage présent sur cette case ?
+                    for item in grille_live.cases[y_new][x_new]:
+                        if isinstance(item, Bras) or isinstance(item, PointMontage):
+                            collision = True
+
+                    if collision:
+                        prochain_mouvement = Mouvement.ATTENDRE
+                        # collision = False
+                        # x_new_colision, y_new_colision = robot.coordonnees_pince().get_position(
+                        #     prochain_mouvement.rotation_90())
+                        # # le prochain mouvement d'un autre bras a déjà réservé cette case ?
+                        # if not grille_live.dans_grille(x_new_colision, y_new_colision):
+                        #     collision = True
+                        # else:
+                        #     for idx_coordonnees in range(0, len(coordonnees_prochain_mouvement), 2):
+                        #         if x_new_colision == coordonnees_prochain_mouvement[idx_coordonnees] and \
+                        #                 y_new_colision == coordonnees_prochain_mouvement[idx_coordonnees + 1]:
+                        #             collision = True
+                        #     for item in grille_live.cases[y_new_colision][x_new_colision]:
+                        #         if isinstance(item, Bras) or isinstance(item, PointMontage):
+                        #             collision = True
+                        # if collision:
+                        #     collision = False
+                        #     x_new_colision, y_new_colision = robot.coordonnees_pince().get_position(
+                        #         prochain_mouvement.rotation_90(2))
+                        #     if not grille_live.dans_grille(x_new_colision, y_new_colision):
+                        #         collision = True
+                        #     else:
+                        #         for idx_coordonnees in range(0, len(coordonnees_prochain_mouvement), 2):
+                        #             if x_new_colision == coordonnees_prochain_mouvement[idx_coordonnees] and \
+                        #                     y_new_colision == coordonnees_prochain_mouvement[idx_coordonnees + 1]:
+                        #                 collision = True
+                        #         for item in grille_live.cases[y_new_colision][x_new_colision]:
+                        #             if isinstance(item, Bras) or isinstance(item, PointMontage):
+                        #                 collision = True
+                        #     if collision:
+                        #         prochain_mouvement = Mouvement.ATTENDRE
+                        #     else:
+                        #         prochain_mouvement = prochain_mouvement.rotation_90(2)
+                        #
+                        # else:
+                        #     prochain_mouvement = prochain_mouvement.rotation_90()
+
+                    # recherche d'un chemin plus optimisé
+                    if prochain_mouvement == Mouvement.ATTENDRE or random.randint(2, 16) < robot.elargissement:
+                        x_min = (pince.x if pince.x < robot.taches[0].etapes[0].x else robot.taches[0].etapes[0].x) - (1 + robot.elargissement)
+                        y_min = (pince.y if pince.y < robot.taches[0].etapes[0].y else robot.taches[0].etapes[0].y) - (1 + robot.elargissement)
+                        x_max = (pince.x if pince.x >= robot.taches[0].etapes[0].x else robot.taches[0].etapes[0].x) + (1 + robot.elargissement)
+                        y_max = (pince.y if pince.y >= robot.taches[0].etapes[0].y else robot.taches[0].etapes[0].y) + (1 + robot.elargissement)
+                        matrix = grille_live.to_matrix(x_min, y_min, x_max, y_max, robot)
+                        # ajoute les prochains mouvements déjà programmé des autres bras
+                        for idx_coordonnees in range(0, len(coordonnees_prochain_mouvement), 2):
+                            if x_min <= coordonnees_prochain_mouvement[idx_coordonnees] <= x_max and \
+                                    y_min <= coordonnees_prochain_mouvement[idx_coordonnees + 1] <= y_max:
+                                matrix[coordonnees_prochain_mouvement[idx_coordonnees + 1] - y_min] \
+                                    [coordonnees_prochain_mouvement[idx_coordonnees] - x_min] = -1
+                        grid = Grid(matrix=matrix)
+                        start = grid.node(pince.x - x_min, pince.y - y_min)
+                        end = grid.node(robot.taches[0].etapes[0].x - x_min, robot.taches[0].etapes[0].y - y_min)
+                        finder = AStarFinder(diagonal_movement=DiagonalMovement.never, weight=10)
+                        path, runs = finder.find_path(start, end, grid)
+                        # print(x_min, y_min, x_max, y_max)
+                        # print(runs, path)
+                        # print(grid.grid_str(path=path, start=start, end=end, show_weight=False))
+
+                        for index_path in range(1, len(path)):
+                            prochain_mouvement: Mouvement
+                            if path[index_path][0] - path[index_path - 1][0] < 0:
+                                prochain_mouvement = Mouvement.GAUCHE
+                            elif path[index_path][0] - path[index_path - 1][0] > 0:
+                                prochain_mouvement = Mouvement.DROITE
+                            elif path[index_path][1] - path[index_path - 1][1] < 0:
+                                prochain_mouvement = Mouvement.BAS
+                            else:
+                                prochain_mouvement = Mouvement.HAUT
+                            robot.mouvements.append(prochain_mouvement)
 
             else:
                 # pas de tache -> attente
@@ -172,13 +198,18 @@ def methode_naive(grille: Grille):
                         prochain_mouvement = Mouvement.BAS
                     else:
                         prochain_mouvement = Mouvement.HAUT
+                else:
+                    robot.stucks = 0
 
+            if len(robot.mouvements):
+                prochain_mouvement = robot.mouvements[0]
 
             x_new, y_new = robot.coordonnees_pince().get_position(prochain_mouvement)
             coordonnees_prochain_mouvement.append(x_new)
             coordonnees_prochain_mouvement.append(y_new)
 
-            robot.mouvements.append(prochain_mouvement)
+            if not len(robot.mouvements):
+                robot.mouvements.append(prochain_mouvement)
             grille_solution.robots[idx_robot].mouvements.append(prochain_mouvement)
 
         # pourcentage de progression
@@ -187,8 +218,15 @@ def methode_naive(grille: Grille):
             print((1000 - int(
                 math.floor((grille_live.step_simulation - 1) / grille_solution.step_simulation * 1000))) / 10,
                   " %")
+            # print(grille_live)
         grille_live.one_step_simulation()
 
+
+
+    # supprime les tâches non finies
+    for index_robot in range(len(grille_live.robots)):
+        if len(grille_live.robots[index_robot].taches) > 0:
+            grille_solution.robots[index_robot].taches.pop()
     if grille_live.longueur <= 100:
         print(grille_live)
     print("Points : ", grille_live.points)

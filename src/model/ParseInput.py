@@ -1,5 +1,6 @@
 import os
 from typing import List
+import math
 
 from src.model.Etape import Etape
 from src.model.Grille import Grille
@@ -69,7 +70,7 @@ class ParseInput:
                 grille.add_tache(tache_tampon)
 
                 # calcul distance aproximative entre chaque étape
-                # for etape in tache_tampon.etapes:
-                #     tache_tampon.distance +=
+                for etape_from, etape_to in zip(tache_tampon.etapes[0::1], tache_tampon.etapes[1::1]):
+                    tache_tampon.distance += math.sqrt((etape_from.x - etape_to.x)**2 + (etape_from.y - etape_to.y)**2)
 
             return grille

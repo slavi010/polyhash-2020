@@ -16,10 +16,21 @@ class Robot:
     taches: List
     mouvements: List
 
+    # juste pour la détection si le bras est stuck
+    last_x: int
+    last_y: int
+    # facteur d'agrandissement de la taille du tableau pour le path finding
+    elargissement: int
+    stucks: int
+
     def __init__(self):
         self.bras = []
         self.taches = []
         self.mouvements = []
+        self.last_x = 0
+        self.last_y = 0
+        self.elargissement = 1
+        self.stucks = 0
 
     def faire_prochain_mouvement_retractation(self, grille):
         """Fait une rétractation et renvoie True si le prochain mouvement est une rétractation.
@@ -47,12 +58,24 @@ class Robot:
             # C'est une rétractation
             # suppression du bras dans cases
             bras_pince = self.coordonnees_pince()
-            for item in grille.cases[bras_pince.y][bras_pince.x]:
+            for index_item, item in enumerate(grille.cases[bras_pince.y][bras_pince.x]):
                 if isinstance(item, Bras):
-                    grille.cases[bras_pince.y][bras_pince.x].remove(item)
+                    grille.cases[bras_pince.y][bras_pince.x].pop(index_item)
+
+            self.is_stuck(x_new, y_new)
 
             self.bras.pop()
             self.mouvements.pop(0)
+
+            # Une étape faite ?
+            if len(self.taches):
+                if self.taches[0].etapes[0] == self.coordonnees_pince():
+                    self.taches[0].etapes.pop(0)
+                    # tâche finie ?
+                    if not len(self.taches[0].etapes):
+                        # ajoute les points
+                        grille.points += self.taches[0].points
+                        self.taches.pop(0)
             return True
 
     def faire_prochain_mouvement(self, grille):
@@ -80,6 +103,8 @@ class Robot:
                     print(grille)
                     raise ConnectionError("COLLISION !!! x.x")
 
+            self.is_stuck(x_new, y_new)
+
             # Tout est ok, ajoute une nouvelle extension de bras
             bras = Bras(x_new, y_new)
             self.bras.append(bras)
@@ -97,6 +122,30 @@ class Robot:
 
         self.mouvements.pop(0)
         return self
+
+    def is_stuck(self, x_new: int, y_new: int):
+        """Détecte si le robot refait le même mouvement
+
+        TODO test
+
+        Retourne vrai si oui.
+        Augmente la valeur d'élergissement.
+        """
+        pince = self.coordonnees_pince()
+
+        is_stuck = False
+
+        if self.last_x == x_new and self.last_y == y_new:
+            self.elargissement = min(int(self.elargissement*2), 16)
+            is_stuck = True
+            self.stucks += 1
+        else:
+            self.elargissement = max(int(self.elargissement/1.5), self.elargissement - 4,  1)
+
+        self.last_x = pince.x
+        self.last_y = pince.y
+
+        return is_stuck
 
     def coordonnees_pince(self):
         """Renvoie l'itemCase de la pince (La dernière extrépité du bras ou le point de montage)
@@ -148,6 +197,7 @@ class Robot:
         distance_min = 9999999
         for tache in grille.taches:
             distance = math.sqrt((tache.etapes[0].x - pince.x)**2 + (tache.etapes[0].y - pince.y)**2)
+            distance += tache.distance
             if distance < distance_min:
                 distance_min = distance
                 tache_min = tache

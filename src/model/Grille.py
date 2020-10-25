@@ -199,7 +199,7 @@ class Grille:
                             if not ok:
                                 map[y - y1].append(-1)
                         elif isinstance(self.cases[y][x][0], Etape):
-                            map[y - y1].append(7)
+                            map[y - y1].append(150)
                     elif len(self.cases[y][x]) == 2:
                         ok = False
                         if robot is not None \
@@ -211,7 +211,7 @@ class Grille:
                         if not ok:
                             map[y - y1].append(-1)
                     else:
-                        map[y - y1].append(5)
+                        map[y - y1].append(100)
         return map
 
     def __str__(self):
