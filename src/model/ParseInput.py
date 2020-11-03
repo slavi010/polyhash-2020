@@ -4,6 +4,7 @@ import math
 
 from src.model.Etape import Etape
 from src.model.Grille import Grille
+from src.model.ItemCase import ItemCase
 from src.model.PointMontage import PointMontage
 from src.model.Robot import Robot
 from src.model.Tache import Tache
@@ -65,12 +66,23 @@ class ParseInput:
                 index += 1
                 tache_tampon: Tache = Tache(lines[index][0], index_tache)
                 index += 1
+
+                g_x = 0
+                g_y = 0
                 for index_etape in range(lines[index-1][1]):
-                    tache_tampon.add_etape(Etape(lines[index][index_etape*2+0], lines[index][index_etape*2+1]))
+                    etape = Etape(lines[index][index_etape*2+0], lines[index][index_etape*2+1])
+                    tache_tampon.add_etape(etape)
+                    g_x += (etape.x - g_x)/len(tache_tampon.etapes)
+                    g_y += (etape.y - g_y)/len(tache_tampon.etapes)
+                tache_tampon.centre_gravite = ItemCase(int(g_x), int(g_y))
+                tache_tampon.distance_centre_gravite = max(tache_tampon.etapes,
+                                                           key=lambda etape: tache_tampon.centre_gravite.distance(etape)) \
+                    .distance(tache_tampon.centre_gravite)
                 grille.add_tache(tache_tampon)
 
-                # calcul distance aproximative entre chaque étape
+                # calcul distance et la surface aproximative entre chaque étape
                 for etape_from, etape_to in zip(tache_tampon.etapes[0::1], tache_tampon.etapes[1::1]):
-                    tache_tampon.distance += math.sqrt((etape_from.x - etape_to.x)**2 + (etape_from.y - etape_to.y)**2)
+                    tache_tampon.distance += etape_from.distance(etape_to)
+                    tache_tampon.surface += etape_from.distance(etape_to)
 
             return grille

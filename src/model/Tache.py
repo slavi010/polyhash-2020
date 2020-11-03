@@ -1,6 +1,7 @@
 from typing import List
 
 from src.model.Etape import Etape
+from src.model.ItemCase import ItemCase
 
 
 class Tache:
@@ -8,8 +9,12 @@ class Tache:
 
     points: int
 
-    # total distance entre chaque étape
-    distance: int
+    # total distance/surface entre chaque étape
+    distance: float
+    surface: float
+    # centre de gravite moyen
+    centre_gravite: ItemCase
+    distance_centre_gravite: float
 
     numero: int
 
@@ -17,10 +22,13 @@ class Tache:
     etapes: List
 
     def __init__(self, points: int, numero: int):
+        self.surface = 0
         self.points = points
         self.etapes = []
         self.distance = 0
         self.numero = numero
+        self.centre_gravite = None
+        self.distance_centre_gravite = 0
 
     def add_etape(self, etape: Etape):
         """Ajoute les étapes dans la tache
@@ -54,3 +62,13 @@ class Tache:
             :rtype: bool
         """
         return not self == other
+
+    def __str__(self) -> str:
+        ret = "Tâche: " + str(self.numero) + " {"
+        for etape in self.etapes:
+            ret += "[{},{}],".format(etape.x, etape.y)
+        ret += "}"
+        return ret
+
+
+        str(self.point_montage.x) + ", " + str(self.point_montage.y)

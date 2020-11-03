@@ -4,6 +4,11 @@ from src.model.ItemCase import ItemCase
 class Etape(ItemCase):
     """Une étape d'une Tâche"""
 
+    # le temps estimer pour aller à cette etape (en effectuant la tâche)
+    # utilisé par le simulateur
+    temps: int = 0
+    temps_aller_retour: int = 0
+
     def __init__(self, x: int, y: int):
         """
 

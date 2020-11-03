@@ -62,3 +62,24 @@ class ItemCase:
             :rtype: bool
         """
         return not self == other
+
+    def distance(self, other):
+        """Calcule la distance entre cette objet et other à vol d'oiseaux
+
+        TODO test
+        """
+        assert other is not None
+
+        return abs(self.x - other.x) + abs(self.y - other.y)
+
+    def surface(self, other):
+        """Calcule la surface entre cette objet et other en un rectangle
+
+        TODO test
+        """
+        assert other is not None
+
+        return abs(self.x - other.x)*abs(self.y - other.y)
+
+    def __str__(self) -> str:
+        return "ItemCase: " + str(self.x) + ", " + str(self.y)

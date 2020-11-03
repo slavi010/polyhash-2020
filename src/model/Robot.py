@@ -2,6 +2,7 @@ from typing import List
 import math
 
 from src.model.Bras import Bras
+from src.model.Etape import Etape
 from src.model.ItemCase import ItemCase
 from src.model.Mouvement import Mouvement
 from src.model.PointMontage import PointMontage
@@ -16,17 +17,23 @@ class Robot:
     taches: List
     mouvements: List
 
+    # les étapes faites
+    etapes_done: List
+
     # juste pour la détection si le bras est stuck
     last_x: int
     last_y: int
     # facteur d'agrandissement de la taille du tableau pour le path finding
     elargissement: int
     stucks: int
+    # une fois la tache finie, doit obligatoirement retourner à cette étape
+    return_etape: Etape
 
     def __init__(self):
         self.bras = []
         self.taches = []
         self.mouvements = []
+        self.etapes_done = []
         self.last_x = 0
         self.last_y = 0
         self.elargissement = 1
@@ -68,14 +75,8 @@ class Robot:
             self.mouvements.pop(0)
 
             # Une étape faite ?
-            if len(self.taches):
-                if self.taches[0].etapes[0] == self.coordonnees_pince():
-                    self.taches[0].etapes.pop(0)
-                    # tâche finie ?
-                    if not len(self.taches[0].etapes):
-                        # ajoute les points
-                        grille.points += self.taches[0].points
-                        self.taches.pop(0)
+            self.delete_etape(grille)
+
             return True
 
     def faire_prochain_mouvement(self, grille):
@@ -111,14 +112,7 @@ class Robot:
             grille.cases[y_new][x_new].append(bras)
 
             # Une étape faite ?
-            if len(self.taches):
-                if self.taches[0].etapes[0] == self.coordonnees_pince():
-                    self.taches[0].etapes.pop(0)
-                    # tâche finie ?
-                    if not len(self.taches[0].etapes):
-                        # ajoute les points
-                        grille.points += self.taches[0].points
-                        self.taches.pop(0)
+            self.delete_etape(grille)
 
         self.mouvements.pop(0)
         return self
@@ -176,11 +170,33 @@ class Robot:
 
         return self
 
+    def delete_etape(self, grille):
+        """Supprime la première étape de la tâche actuelle.
+
+        Supprime la tache s'il n'y a plus d'étape. (et ajoute les points à la grille)
+
+        TODO test
+
+        :param grille: La grille
+        """
+        if len(self.taches):
+            if self.taches[0].etapes[0] == self.coordonnees_pince():
+                self.etapes_done.append(self.taches[0].etapes[0])
+                self.taches[0].etapes.pop(0)
+                # tâche finie ?
+                if not len(self.taches[0].etapes):
+                    # ajoute les points
+                    grille.points += self.taches[0].points
+                    self.taches.pop(0)
+
+        return self
+
     def get_plus_proche_tache(self, grille):
         """Retourne la plus proche tâche non déjà assignée par rapport à la pince
 
         La distance est évaluée à vol d'oiseaux.
         On considère la première étape de la tâche comme position.
+        Prend en compte aussi la distance entre chaque étape de la tâche.
         Renvoie None s'il n'y a plus de tâche disponible.
 
         :return: soit une tache, soit None si pas de tâche dispo
@@ -200,6 +216,31 @@ class Robot:
             distance += tache.distance
             if distance < distance_min:
                 distance_min = distance
+                tache_min = tache
+
+        return tache_min
+
+    def get_tache_plus_rentable(self, grille):
+        """Retourne la tâche qui est suceptible d'être la plus rentable au niveau points/distance
+
+        :return: soit une tache, soit None si pas de tâche dispo
+        :rtype: Tache, None
+        """
+        assert grille is not None
+
+        if not len(grille.taches):
+            return None
+
+        pince: ItemCase = self.coordonnees_pince()
+
+        tache_min = None
+        facteur_max = 0
+        for tache in grille.taches:
+            facteur = math.sqrt((tache.etapes[0].x - pince.x)**2 + (tache.etapes[0].y - pince.y)**2)
+            facteur += tache.distance
+            facteur = tache.points/facteur
+            if facteur > facteur_max:
+                facteur_max = facteur
                 tache_min = tache
 
         return tache_min

@@ -10,7 +10,7 @@ class ExportOutput:
     def __init__(self):
         pass
 
-    def exportOutput(self, grille: Grille):
+    def exportOutput(self, grille: Grille, name: str):
         """lecture du fichier de sortie
         -> nombre de robots utilisés
         -> Premier Robot : Coordonées de montages + nombre de taches faites + nombre d'étapes
@@ -22,7 +22,7 @@ class ExportOutput:
         """
 
         #Création + écriture fichier output
-        output = open("output.txt","w")
+        output = open(name,"w")
 
         # calcule nb robot actif
         actif = 0
