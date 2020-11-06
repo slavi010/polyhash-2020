@@ -73,7 +73,6 @@ class Grille:
         Si une tâche n'a plus d'étape, ajoute les points de la tâche et supprime la tâche du robot.
 
         """
-
         if not self.step_simulation:
             raise ValueError("La simulation est finie !")
         self.step_simulation -= 1
@@ -164,8 +163,8 @@ class Grille:
         0 pour un point de montage
         -1 pour un bras d'autre robots (avec ou sons etape)
         1 pour les bras du robot actuel (si lieu)
-        5 pour le vide
-        7 pour une etape
+        100 pour le vide
+        150 pour une etape
 
         :param robot: Le point de vue du robot actuel (notamment pour la rétractation)
         :return : La carte en deux dimenssions

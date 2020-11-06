@@ -18,10 +18,12 @@ from src.model.ItemCase import ItemCase
 from src.model.Mouvement import Mouvement
 from src.model.PointMontage import PointMontage
 from src.model.Tache import Tache
+from src.model.TypeMap import TypeMap
 
 
 def methode_naive(
         grille: Grille,
+        map: TypeMap,
         MAX_STUCK: int,
         FACTEUR_DISTANCE_RETRACTATION: int,
         MAX_DIST_PM: int,
@@ -80,8 +82,9 @@ def methode_naive(
                 if pm == point_montage:
                     ok = False
             # f_decentralized
-            if 40 < min(point_montage.x, grille.longueur - point_montage.x, point_montage.y, grille.hauteur - point_montage.y):
-                ok = False
+            if map == TypeMap.F:
+                if 40 < min(point_montage.x, grille.longueur - point_montage.x, point_montage.y, grille.hauteur - point_montage.y):
+                    ok = False
 
             if ok:
                 total_facteur = 0
@@ -125,7 +128,7 @@ def methode_naive(
             if robot.stucks == MAX_STUCK:
                 robot.mouvements.clear()
 
-            if not len(robot.taches) and len(robot.bras) <= 10 and len(grille_live.taches):
+            if not len(robot.taches) and len(grille_live.taches):
                 # oblige la rétractation après finition d'une tâche
 
                 # prochaine tâche
@@ -240,10 +243,10 @@ def methode_naive(
 
                     facteur = (facteur+ADDITION[0])\
                               * (tache.centre_gravite.distance(robot.point_montage) + ADDITION[1])\
-                              * (tache.distance_centre_gravite+ADDITION[2])
+                              * (tache.distance_centre_gravite+ADDITION[2])\
+                              * (intersection+ADDITION[3])
 
-                    if intersection -50 < intersection_min \
-                            and distance_pince_min > facteur\
+                    if facteur_max > facteur\
                             and max_distance_from_pm < MAX_DIST_PM :
                         intersection_min = intersection
                         facteur_max = facteur
@@ -481,12 +484,17 @@ def methode_naive(
                 math.floor((grille_live.step_simulation - 1) / grille_solution.step_simulation * 1000))) / 10
             temps_estime = math.floor((os.times()[0] - stated_time) / (pourcentage + 0.000000001) * (100 - pourcentage))
             total_point_en_cours = 0
+            total_tache_restante = len(grille_live.taches)
             for robot in grille_live.robots:
                 for tache in robot.taches:
+                    total_tache_restante += 1
                     total_point_en_cours += tache.points
             if affichage_console:
-                print(pourcentage, " %, " + str(temps_estime // 60), " min ", str(temps_estime % 60), "sec, ",
-                      grille_live.points // 1000, " K points, ", total_point_en_cours, " points en cours")
+                print(pourcentage, " %, ",
+                      temps_estime // 60, " min ", str(temps_estime % 60), "sec, ",
+                      grille_live.points // 1000, " K points, ",
+                      total_tache_restante, " taches restantes, ",
+                      total_point_en_cours, " points en cours")
             if affichage_graphique:
                 debug_canvas.update()
         # print(grille_live)

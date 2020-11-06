@@ -130,7 +130,7 @@ class Robot:
         is_stuck = False
 
         if self.last_x == x_new and self.last_y == y_new:
-            self.elargissement = min(int(self.elargissement*2), 16)
+            self.elargissement = min(int(self.elargissement*2), 8)
             is_stuck = True
             self.stucks += 1
         else:
