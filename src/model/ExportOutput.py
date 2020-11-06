@@ -1,14 +1,54 @@
 from typing import List
 
+from typing import List, Union
+
+
 from src.model.Grille import Grille
 from src.model.Mouvement import Mouvement
-from src.model.Tache import Tache
+
+from src.model.ParseInput import ParseInput
+from src.model.TypeMap import TypeMap
 
 
 class ExportOutput:
 
     def __init__(self):
         pass
+
+    def traitementAPropre(self):
+
+
+        pass
+        
+        
+        
+    # def traitementA(self):
+    #
+    #     #Façon simple
+    #     output = open(name, "w")
+    #
+    #
+    #     output.write("2\n")  # ecrire nombre de robots utilisés
+    #
+    #
+    #     output.write("1 3 2 3\n")
+    #     output.write("0 2")
+    #     output.write("\n")
+    #     output.write("R R W")
+    #     output.write("\n")
+    #
+    #     output.write("3 2 1 3\n")
+    #     output.write("1")
+    #     output.write("\n")
+    #     output.write("R D D")
+    #     output.write("\n")
+    #
+    #     # fermeture fichier output
+    #     output.close()
+
+
+
+
 
     def exportOutput(self, grille: Grille, name: str):
         """lecture du fichier de sortie
@@ -58,3 +98,47 @@ class ExportOutput:
 
 
 
+if __name__ == "__main__":
+    grille = ParseInput().parse(TypeMap.A.get_path())
+    robot1 = grille.robots[0]
+    pm1 = None
+    pm2 = None
+    for point_montage in grille.point_montages:
+        if point_montage.x == 1 and point_montage.y == 3:
+            pm1 = point_montage
+
+        elif point_montage.x == 3 and point_montage.y == 2:
+            pm2 = point_montage
+
+    tache1 = -1
+    tache2 = -1
+    tache3 = -1
+    for tache in grille.taches:
+        if tache.numero == 0:
+            tache1 = tache
+
+        elif tache.numero == 1:
+            tache2 = tache
+        elif tache.numero == 2:
+            tache3 = tache
+
+    #if pm1 is not None and pm2 is not None and -1 != tache1 and -1 != tache2 and -1 != tache3:
+    robot1.point_montage = pm1
+    robot1.add_tache(tache1, grille)
+    robot1.add_tache(tache3, grille)
+    robot1.mouvements.append(Mouvement.DROITE)
+    robot1.mouvements.append(Mouvement.DROITE)
+    robot1.mouvements.append(Mouvement.ATTENDRE)
+
+    robot2 = grille.robots[1]
+    robot2.point_montage = pm2
+    robot2.add_tache(tache2, grille)
+    robot2.mouvements.append(Mouvement.DROITE)
+    robot2.mouvements.append(Mouvement.BAS)
+    robot2.mouvements.append(Mouvement.BAS)
+
+    ExportOutput().exportOutput(grille, "a.out")
+
+
+    #else:
+     #   print("Problème sur les points de montages ou les tâches")
