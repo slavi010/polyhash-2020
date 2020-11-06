@@ -64,7 +64,7 @@ class ItemCase:
         return not self == other
 
     def distance(self, other):
-        """Calcule la distance entre cette objet et other à vol d'oiseaux
+        """Calcule la distance entre cet objet et other à vol d'oiseaux
 
         TODO test
         """

@@ -5,20 +5,20 @@ from src.model.ItemCase import ItemCase
 
 
 class Tache:
-    """Une tâche à acomplire"""
+    """Une tâche à accomplir"""
 
     points: int
 
-    # total distance/surface entre chaque étape
+    # total distance et surface entre chaque étape
     distance: float
     surface: float
-    # centre de gravite moyen
+    # centre de gravité moyen
     centre_gravite: ItemCase
     distance_centre_gravite: float
 
     numero: int
 
-    # les etapes a effectuer triée dans l'ordre
+    # les étapes a effectuer triée dans l'ordre
     etapes: List
 
     def __init__(self, points: int, numero: int):

@@ -13,10 +13,10 @@ class Mouvement(Enum):
         return self.value
 
     def rotation_90(self, multiplicateur: int = 1):
-        """Retourne le mouvemnt après rotation a 90° dans le sens horaire
+        """Retourne le mouvement après rotation a 90° dans le sens horaire
 
         Exemple :
-            Si mouvement = HAUT et multiplicateur = 1 alors retorune DROITE
+            Si mouvement = HAUT et multiplicateur = 1 alors retourne DROITE
 
         :param multiplicateur: Multiplication par 90°
         :return: Mouvement après rotation

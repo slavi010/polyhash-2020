@@ -11,7 +11,7 @@ from src.model.Tache import Tache
 
 
 class ParseInput:
-    """Parser qui permet de lire le fichier texte d'input fourni par google."""
+    """Parser qui permet de lire le fichier texte d'input fourni par Google."""
 
     grille: Grille
 
@@ -58,7 +58,7 @@ class ParseInput:
 
             # Récupére les informations de chaque tâche
             # instancier dans grille les tâches correspondantes
-            # si une étape (assembly point) n'est pas encore créer dans la grille au cordonnées correspondantes,
+            # si une étape (assembly point) n'est pas encore créée dans la grille aux cordonnées correspondantes,
             # l'instancier et la mettre dans la grille (et ne pas oublier de l'associer à la tâche)
 
             # Crée les instances Taches et Etapes
@@ -80,7 +80,7 @@ class ParseInput:
                     .distance(tache_tampon.centre_gravite)
                 grille.add_tache(tache_tampon)
 
-                # calcul distance et la surface aproximative entre chaque étape
+                # calcul la distance et la surface aproximative entre chaque étape
                 for etape_from, etape_to in zip(tache_tampon.etapes[0::1], tache_tampon.etapes[1::1]):
                     tache_tampon.distance += etape_from.distance(etape_to)
                     tache_tampon.surface += etape_from.distance(etape_to)

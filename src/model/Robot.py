@@ -17,10 +17,10 @@ class Robot:
     taches: List
     mouvements: List
 
-    # les étapes faites
+    # les étapes réalisées
     etapes_done: List
 
-    # juste pour la détection si le bras est stuck
+    # utilisé uniquement pour la détection si le bras est coincé
     last_x: int
     last_y: int
     # facteur d'agrandissement de la taille du tableau pour le path finding
@@ -106,7 +106,7 @@ class Robot:
 
             self.is_stuck(x_new, y_new)
 
-            # Tout est ok, ajoute une nouvelle extension de bras
+            # Tout est ok, pas d'erreurs, ajoute une nouvelle extension de bras
             bras = Bras(x_new, y_new)
             self.bras.append(bras)
             grille.cases[y_new][x_new].append(bras)
@@ -142,7 +142,7 @@ class Robot:
         return is_stuck
 
     def coordonnees_pince(self):
-        """Renvoie l'itemCase de la pince (La dernière extrépité du bras ou le point de montage)
+        """Renvoie l'itemCase de la pince (La dernière extrémité du bras ou le point de montage)
 
         :rtype: ItemCase
         """
@@ -150,7 +150,7 @@ class Robot:
             # la pince est au point de montage
             return self.point_montage
         else:
-            # prend le dernier bras
+            # prend la denière case dans laquelle est le bras
             return self.bras[-1]
 
     def add_tache(self, tache: Tache, grille):
@@ -236,6 +236,7 @@ class Robot:
         tache_min = None
         facteur_max = 0
         for tache in grille.taches:
+            # facteur est un ratio entre les points que rapporte la tâche et la distance à parcourir pour la réaliser
             facteur = math.sqrt((tache.etapes[0].x - pince.x)**2 + (tache.etapes[0].y - pince.y)**2)
             facteur += tache.distance
             facteur = tache.points/facteur
