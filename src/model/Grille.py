@@ -1,3 +1,4 @@
+import heapq
 from typing import List, Union
 
 from src.model.Bras import Bras
@@ -239,14 +240,22 @@ class Grille:
             map += "\n"
         return map
 
-    def pathfinder(self, depart : ItemCase, arrivee : Etape, bras_robot : list):
+    def pathfinder(self, depart: ItemCase,
+                   arrivee: Etape,
+                   bras_robot: List,
+                   carte: List,
+                   x_offset: int,
+                   y_offset: int):
+
+        depart_coord = (depart.x, depart.y)
+        arrivee_coord = (arrivee.x, arrivee.y)
 
         #openList liste cases à évaluer
         openList : list = []
-        openList.append(depart)
+        # openList.append(depart_coord)
 
         #closeList liste cases déjà évaluées
-        closeList: list = []
+        closeList = set()
 
         #liste des parents de la case
         came_from = {}
@@ -255,64 +264,75 @@ class Grille:
         #gscore : distance au pts de départ (nbr de case déjà traversée pour y arriver)
         #hscore : distance au pts d'arrivée (x arrivee - x current )² + (y arrivee - y current )²
         #fscore = hscore + gscore
-        gscore = {start: 0}
-        fscore = {start: (arrivee[0] - depart[0]) ** 2 + (arrivee[1] - depart[1]) ** 2)}
+        gscore = {depart_coord: 0}
+        fscore = {depart_coord: (arrivee.x - depart.x) ** 2 + (arrivee.y - depart.y) ** 2}
 
         # ajouter depart à openList
-        heapq.heappush(openList, (fscore[depart], depart))
+        heapq.heappush(openList, (fscore[depart_coord], depart_coord))
 
         #tant que openList n'est pas vide ou qu'on est pas déjà sorti de la boucle
         while len(openList) > 0 :
             #current_case = la case dans openList ayant le fscore le plus petit
-            current_case: ItemCase= heapq.heappop(openList)[1]
+            current_case_coord: tuple = heapq.heappop(openList)[1]
 
             #mettre current dans closeList
-            closeList.append(current_case)
+            closeList.add(current_case_coord)
 
             #si current_case est l'arrivee
-            if current_case == arrivee :
+            if current_case_coord == arrivee_coord:
                 chemin : list = []
-                while current_case in came_from:
-                    chemin.append(current_case)
-                    current_case = came_from[current_case]
+                while current_case_coord in came_from:
+                    chemin.append(current_case_coord)
+                    current_case_coord = came_from[current_case_coord]
                 return chemin[::-1]
 
             #liste des voisins de current: [X+1]/[x-1]/[y+1]/[y-1]
-            voisins : list = [self.cases[current_case.x + 1][current_case.y],self.cases[current_case.x - 1][current_case.y],self.cases[current_case.x][current_case.y + 1],self.cases[current_case.x][current_case.y - 1]]
+            voisin_offsets : list = [(1, 0),(-1, 0),(0, 1), (0, -1)]
 
             #pour tous les voisin dans voisins
-            for voisin in voisins :
+            for voisin in voisin_offsets :
+
+                coord_voisin_abs = (voisin[0] + current_case_coord[0], voisin[1] + current_case_coord[1])
+                coord_voisin_relatif = (voisin[0] + current_case_coord[0] - x_offset, voisin[1] + current_case_coord[1] - y_offset)
+
+                # si il n'est pas dans la grille
+                if not self.dans_grille(coord_voisin_abs[0], coord_voisin_abs[1]):
+                    continue
+                if 0 <= coord_voisin_relatif[0] < len(carte[0]):
+                    if not (0 <= coord_voisin_relatif[1] < len(carte)):
+                        # array bound y walls
+                        continue
+                else:
+                    # array bound x walls
+                    continue
 
                 # si on ne peux pas traverser le voisin ou que le voisin est dans DONE
-                if (map[voisin[O]][voisin[1]] < 1) or (voisin is in closeList) :
+                if (carte[coord_voisin_relatif[1]][coord_voisin_relatif[0]] < 1) or (coord_voisin_abs in closeList) :
                     continue
                     #aller au prochain voisin
 
-                #si il n'est pas dans la grille
-                if self.dans_grille(self, voisin[0], voisin[1]) == False :
-                    continue
-
-                #si il s'agit du bras de notre robot
-                if map[voisin[0]][voisin[1]] = 1 :
-                    if (voisin[0]; voisin[1]) != bras_robot[-2] : #ou -1 jsp ou ça commencera
+                # si il s'agit du bras de notre robot
+                if carte[coord_voisin_relatif[1]][coord_voisin_relatif[0]] == 1:
+                    if len(bras_robot) >= 2 and (coord_voisin_abs[0] != bras_robot[-2].x or coord_voisin_abs[1] != bras_robot[-2].y): #ou -1 jsp ou ça commencera
                         continue
-                        #il ne s'agit pas de rétractation
+                        # il ne s'agit pas de rétractation
 
                 #voisin g = current g + 1
-                voisin_g_score : int = gscore[current] + 1
+                voisin_g_score: int = gscore[current_case_coord] + 1
                 #voisin h = (x arrivee - x voisin )**2 + (y arrivee - y voisin )**2
                 #voisin f = voisin g + voisin h + map[voisin[0]][voisin[1]]
-
 
                 # si le new chemin jusqu'à ce voisin est + court (son g score est + petit avec ce nouveau chemin)
                 # ou que le voisin n'est pas dan la openListe
 
-                if voisin_g_score < gscore.get(voisin, 0) or neighbor not in openList:
-                    came_from[voisin] = current_case
-                    gscore[voisin] = voisin_g_score
-                    fscore[voisin] = voisin_g_score + map[voisin[0]][voisin[1]]  + (arrivee[0] - voisin[0]) ** 2 + (arrivee[1] - voisin[1]) ** 2)
-                    openList.append(voisin) #maybe
-                    heapq.heappush(openList, (fscore[voisin], voisin))
+                if voisin_g_score < gscore.get(coord_voisin_abs, 0) or coord_voisin_abs not in [i[1]for i in openList]:
+                    came_from[coord_voisin_abs] = current_case_coord
+                    gscore[coord_voisin_abs] = voisin_g_score
+                    fscore[coord_voisin_abs] = voisin_g_score\
+                                               + carte[coord_voisin_relatif[1]][coord_voisin_relatif[0]]\
+                                               + (arrivee.x - coord_voisin_abs[0]) ** 2 + (arrivee.y - coord_voisin_abs[1]) ** 2
+                    # openList.append(coord_voisin_abs)
+                    heapq.heappush(openList, (fscore[coord_voisin_abs], coord_voisin_abs))
 
         return None
 

@@ -18,11 +18,10 @@ from src.model.ParseInput import ParseInput
 from src.model.TypeMap import TypeMap
 
 if __name__ == "__main__":
-    map = TypeMap.D
+    map = TypeMap.F
     iteration = 50
     affichage_graphique = False
-    affichage_console = False
-
+    affichage_console = True
 
     FACTEUR_DISTANCE_RETRACTATION = int
     MAX_STUCK = int
@@ -63,7 +62,7 @@ if __name__ == "__main__":
         elif map == TypeMap.D:
             FACTEUR_DISTANCE_RETRACTATION = 30
             MAX_STUCK = 34
-            MAX_DIST_PM = 5
+            MAX_DIST_PM = 15
             ADDITION = (0.007439079675817982, 6, 15, 2)
             # ADDITION = (random.random() * 0.01 + 0.0001,
             #             random.randint(6, 15),
@@ -78,7 +77,8 @@ if __name__ == "__main__":
             MAX_DIST_PM = random.randint(110, 120)
             ADDITION = (0.304678,
                         13,
-                        5)
+                        5,
+                        42)
             FACTEUR_CONCENTRATION_BRAS = 0.18
 
         # d

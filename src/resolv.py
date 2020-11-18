@@ -1,4 +1,4 @@
-"""Se fichier contien les fonctions pour trouver une solution à la grille"""
+"""Ce fichier contient les fonctions pour trouver une solution à la grille"""
 
 import copy
 import math
@@ -20,14 +20,15 @@ from src.model.PointMontage import PointMontage
 from src.model.Tache import Tache
 from src.model.TypeMap import TypeMap
 
-
+# méthode (plus si naive que ça ) pour répondre au problème
 def methode_naive(
-        grille: Grille,
-        map: TypeMap,
+        #initialisation des variables
+        grille: Grille, # grille modélisant le cas à résoudre
+        map: TypeMap,  # le cas donn à résoudre (sélection dans fichier 'main')
         MAX_STUCK: int,
         FACTEUR_DISTANCE_RETRACTATION: int,
         MAX_DIST_PM: int,
-        ADDITION: Tuple,
+        ADDITION: Tuple, # un tuple qui contient les valeurs de pondération pour chaque cas
         FACTEUR_CONCENTRATION_BRAS: float = 1,
         affichage_graphique: bool = True,
         affichage_console: bool = True):
@@ -268,6 +269,9 @@ def methode_naive(
 
             prochain_mouvement: Mouvement = Mouvement.ATTENDRE
 
+            if pince.x == 0 and pince.y == 209:
+                print("ok")
+
             if len(robot.taches) and robot.stucks < MAX_STUCK:
                 # toujours d'actu?
                 if len(robot.mouvements):
@@ -393,11 +397,22 @@ def methode_naive(
                                     y_min <= coordonnees_prochain_mouvement[idx_coordonnees + 1] <= y_max:
                                 matrix[coordonnees_prochain_mouvement[idx_coordonnees + 1] - y_min] \
                                     [coordonnees_prochain_mouvement[idx_coordonnees] - x_min] = -1
-                        grid = Grid(matrix=matrix)
-                        start = grid.node(pince.x - x_min, pince.y - y_min)
-                        end = grid.node(robot.taches[0].etapes[0].x - x_min, robot.taches[0].etapes[0].y - y_min)
-                        finder = AStarFinder(diagonal_movement=DiagonalMovement.only_when_no_obstacle)
-                        path, runs = finder.find_path(start, end, grid)
+
+
+
+                        # grid = Grid(matrix=matrix)
+                        # start = grid.node(pince.x - x_min, pince.y - y_min)
+                        # end = grid.node(robot.taches[0].etapes[0].x - x_min, robot.taches[0].etapes[0].y - y_min)
+                        # finder = AStarFinder(diagonal_movement=DiagonalMovement.only_when_no_obstacle)
+                        # path, runs = finder.find_path(start, end, grid)
+
+                        start = robot.coordonnees_pince()
+                        end = robot.taches[0].etapes[0]
+                        path = grille_live.pathfinder(start, end, robot.bras, matrix, x_min, y_min)
+
+
+
+
                         # print(x_min, y_min, x_max, y_max)
                         # print(runs, path)
                         # print(grid.grid_str(path=path, start=start, end=end, show_weight=False))
