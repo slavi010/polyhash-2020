@@ -1,7 +1,7 @@
 # PolyHash 2020
 ============
 
-TODO description
+Pour ce projet, nous avons cherché à résoudre le problème poser lors du Google hash code de 2020.
 
 # Notre équipe
 ===========
@@ -10,5 +10,3 @@ TODO description
 * Chama EL MAJENY
 * Remy BORIUS
 
-# Notre Google Drive
-https://docs.google.com/document/d/16FIVMY5yLFmL3x_U3LUT69Os3WhD6izMZPnoFN9-WVg/edit#heading=h.gtysyj3szpe8

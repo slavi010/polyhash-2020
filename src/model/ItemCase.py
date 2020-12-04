@@ -21,7 +21,7 @@ class ItemCase:
         self.x = x
         self.y = y
 
-    def get_position(self, mouvement: Mouvement = None):
+    def get_position(self, mouvement: Mouvement = None) -> (int,int):
         """Retourner les coordonnées x et y après application d'un mouvement.
 
         :param mouvement: Le mouvement appliqué

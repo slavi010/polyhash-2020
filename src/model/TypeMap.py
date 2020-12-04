@@ -2,7 +2,7 @@ from enum import Enum
 
 
 class TypeMap (Enum):
-    """Le mouvement d'un robot"""
+    """Les différentes grilles """
     A = {"name": "A", "path": "data/input/a_example.txt"}
     B = {"name": "B", "path": "data/input/b_single_arm.txt"}
     C = {"name": "C", "path": "data/input/c_few_arms.txt"}

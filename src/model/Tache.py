@@ -12,6 +12,7 @@ class Tache:
     # total distance et surface entre chaque étape
     distance: float
     surface: float
+
     # centre de gravité moyen
     centre_gravite: ItemCase
     distance_centre_gravite: float

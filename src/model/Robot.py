@@ -23,9 +23,11 @@ class Robot:
     # utilisé uniquement pour la détection si le bras est coincé
     last_x: int
     last_y: int
+
     # facteur d'agrandissement de la taille du tableau pour le path finding
     elargissement: int
     stucks: int
+
     # une fois la tache finie, doit obligatoirement retourner à cette étape
     return_etape: Etape
 
@@ -212,6 +214,7 @@ class Robot:
         tache_min = None
         distance_min = 9999999
         for tache in grille.taches:
+            #calcul de la distance euclidienne entre la tache et la pince du robot
             distance = math.sqrt((tache.etapes[0].x - pince.x)**2 + (tache.etapes[0].y - pince.y)**2)
             distance += tache.distance
             if distance < distance_min:

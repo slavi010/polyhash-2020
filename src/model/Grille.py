@@ -48,9 +48,9 @@ class Grille:
     def start_simulation(self):
         """Lance la simulation
 
-        Va dérouler l'algo de chaque robot à chaque instant t.
+        Va dérouler l'algorithme pour chaque robot à chaque instant t.
 
-        Doit vérifier que les robots ont finis toutes leurs taches et mouvement.
+        Doit vérifier que les robots ont finis toutes leurs taches et mouvements.
         """
 
         while self.step_simulation > 0:
@@ -186,7 +186,9 @@ class Grille:
                 else:
                     if len(self.cases[y][x]) == 1:
                         if isinstance(self.cases[y][x][0], PointMontage):
+                            # il s'agit d'un point de montage
                             map[y - y1].append(0)
+
                         elif isinstance(self.cases[y][x][0], Bras):
                             # le bras du robot ?
                             ok = False
@@ -195,11 +197,17 @@ class Grille:
                                          (len(robot.bras) > 2 and self.cases[y][x][0] == robot.bras[-2]) or
                                          (len(robot.bras) == 1 and self.cases[y][x][0] == robot.point_montage)):
                                 ok = True
+                                # c'est une pince de robot, la dernière case d'un bras
                                 map[y - y1].append(1)
+
                             if not ok:
+                                # c'est le bras d'un robot
                                 map[y - y1].append(-1)
+
                         elif isinstance(self.cases[y][x][0], Etape):
+                            # il s'agit d'une étape
                             map[y - y1].append(150)
+
                     elif len(self.cases[y][x]) == 2:
                         ok = False
                         if robot is not None \
@@ -207,10 +215,13 @@ class Grille:
                                   (len(robot.bras) > 2 and self.cases[y][x][0] == robot.bras[-2]) or
                                   (len(robot.bras) == 1 and self.cases[y][x][0] == robot.point_montage)):
                             ok = True
+                            #c'est une pince de robot, la dernière case d'un bras
                             map[y - y1].append(1)
                         if not ok:
+                            #c'est un bras de robot
                             map[y - y1].append(-1)
                     else:
+                        #c'est une case vide
                         map[y - y1].append(100)
         return map
 
@@ -319,14 +330,16 @@ class Grille:
 
                 #voisin g = current g + 1
                 voisin_g_score: int = gscore[current_case_coord] + 1
-                #voisin h = (x arrivee - x voisin )**2 + (y arrivee - y voisin )**2
-                #voisin f = voisin g + voisin h + map[voisin[0]][voisin[1]]
 
-                # si le new chemin jusqu'à ce voisin est + court (son g score est + petit avec ce nouveau chemin)
+
+                # si le nouveau chemin jusqu'à ce voisin est + court (son g score est + petit avec ce nouveau chemin)
                 # ou que le voisin n'est pas dan la openListe
 
                 if voisin_g_score < gscore.get(coord_voisin_abs, 0) or coord_voisin_abs not in [i[1]for i in openList]:
                     came_from[coord_voisin_abs] = current_case_coord
+
+                    # voisin h = (x arrivee - x voisin )**2 + (y arrivee - y voisin )**2
+                    # voisin f = voisin g + voisin h + map[voisin[0]][voisin[1]]
                     gscore[coord_voisin_abs] = voisin_g_score
                     fscore[coord_voisin_abs] = voisin_g_score\
                                                + carte[coord_voisin_relatif[1]][coord_voisin_relatif[0]]\
