@@ -417,31 +417,40 @@ def methode_naive(
                         # print(runs, path)
                         # print(grid.grid_str(path=path, start=start, end=end, show_weight=False))
 
-                        for index_path in range(1, len(path)):
-                            prochain_mouvement: Mouvement
-                            x_diff = path[index_path][0] - path[index_path - 1][0]
-                            y_diff = path[index_path][1] - path[index_path - 1][1]
-                            if x_diff < 0 and y_diff < 0:
-                                robot.mouvements.append(Mouvement.GAUCHE)
-                                prochain_mouvement = Mouvement.BAS
-                            elif x_diff < 0 and y_diff == 0:
-                                prochain_mouvement = Mouvement.GAUCHE
-                            elif x_diff < 0:
-                                robot.mouvements.append(Mouvement.GAUCHE)
-                                prochain_mouvement = Mouvement.HAUT
-                            elif x_diff == 0 and y_diff < 0:
-                                prochain_mouvement = Mouvement.BAS
-                            elif x_diff == 0:
-                                prochain_mouvement = Mouvement.HAUT
-                            elif x_diff > 0 and y_diff < 0:
-                                robot.mouvements.append(Mouvement.DROITE)
-                                prochain_mouvement = Mouvement.BAS
-                            elif x_diff > 0 and y_diff == 0:
-                                prochain_mouvement = Mouvement.DROITE
-                            else:
-                                robot.mouvements.append(Mouvement.DROITE)
-                                prochain_mouvement = Mouvement.HAUT
-                            robot.mouvements.append(prochain_mouvement)
+                        if path is not None:
+                            for index_path in range(0, len(path)):
+                                # if 0 == path[index_path][0] and 209 == path[index_path][1]:
+                                #     for line in matrix:
+                                #         print(line)
+                                #     print(path)
+                                #     print(grille_live)
+                                #     print("ok")
+
+                                prochain_mouvement: Mouvement
+
+                                x_diff = path[index_path][0] - (path[index_path - 1][0] if index_path != 0 else start.x)
+                                y_diff = path[index_path][1] - (path[index_path - 1][1] if index_path != 0 else start.y)
+                                if x_diff < 0 and y_diff < 0:
+                                    robot.mouvements.append(Mouvement.GAUCHE)
+                                    prochain_mouvement = Mouvement.BAS
+                                elif x_diff < 0 and y_diff == 0:
+                                    prochain_mouvement = Mouvement.GAUCHE
+                                elif x_diff < 0:
+                                    robot.mouvements.append(Mouvement.GAUCHE)
+                                    prochain_mouvement = Mouvement.HAUT
+                                elif x_diff == 0 and y_diff < 0:
+                                    prochain_mouvement = Mouvement.BAS
+                                elif x_diff == 0:
+                                    prochain_mouvement = Mouvement.HAUT
+                                elif x_diff > 0 and y_diff < 0:
+                                    robot.mouvements.append(Mouvement.DROITE)
+                                    prochain_mouvement = Mouvement.BAS
+                                elif x_diff > 0 and y_diff == 0:
+                                    prochain_mouvement = Mouvement.DROITE
+                                else:
+                                    robot.mouvements.append(Mouvement.DROITE)
+                                    prochain_mouvement = Mouvement.HAUT
+                                robot.mouvements.append(prochain_mouvement)
 
             else:
                 # pas de tache -> attente
