@@ -98,6 +98,14 @@ def methode_naive(
             point_montage_deja_pris.append(point_montage_min)
             grille.robots[idx_robot].point_montage = point_montage_min
 
+    nb_robot_sans_pm = 0
+    for robot in grille.robots:
+        if robot.point_montage is None:
+            nb_robot_sans_pm += 1
+    if nb_robot_sans_pm:
+        raise ValueError(f'Il y a {nb_robot_sans_pm} robot(s) qui n\'ont pas de point de montage assigné. '
+                         f'Pensez à réduire la valeur de FACTEUR_DISTANCE_RETRACTATION.')
+
 
     # for i in range(len(grille.robots) - 100):
     #     grille.robots.pop(random.randint(0, len(grille.robots) - 1))
@@ -256,7 +264,7 @@ def methode_naive(
 
                 if prochaine_tache is not None:
                     if affichage_console:
-                        print("distance: ", str(prochaine_tache.etapes[0].distance(robot.point_montage)), ", etapes: ", len(prochaine_tache.etapes),
+                        print(" --> Nouvelle tâche assignée : distance: ", str(prochaine_tache.etapes[0].distance(robot.point_montage)), ", etapes: ", len(prochaine_tache.etapes),
                               ", min intersection: ", intersection_min, ", facteur: ", int(facteur_max), ", ",
                               prochaine_tache.points, " points")
 
@@ -268,9 +276,6 @@ def methode_naive(
                             grille_solution.robots[idx_robot].add_tache(prochaine_tache, grille_solution)
 
             prochain_mouvement: Mouvement = Mouvement.ATTENDRE
-
-            if pince.x == 0 and pince.y == 209:
-                print("ok")
 
             if len(robot.taches) and robot.stucks < MAX_STUCK:
                 # toujours d'actu?

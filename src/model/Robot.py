@@ -40,6 +40,7 @@ class Robot:
         self.last_y = 0
         self.elargissement = 1
         self.stucks = 0
+        self.point_montage = None
 
     def faire_prochain_mouvement_retractation(self, grille):
         """Fait une rétractation et renvoie True si le prochain mouvement est une rétractation.
