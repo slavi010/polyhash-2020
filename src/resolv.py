@@ -349,41 +349,6 @@ def methode_naive(
                     if collision:
 
                         prochain_mouvement = Mouvement.ATTENDRE
-                        # collision = False
-                        # x_new_colision, y_new_colision = robot.coordonnees_pince().get_position(
-                        #     prochain_mouvement.rotation_90())
-                        # # le prochain mouvement d'un autre bras a déjà réservé cette case ?
-                        # if not grille_live.dans_grille(x_new_colision, y_new_colision):
-                        #     collision = True
-                        # else:
-                        #     for idx_coordonnees in range(0, len(coordonnees_prochain_mouvement), 2):
-                        #         if x_new_colision == coordonnees_prochain_mouvement[idx_coordonnees] and \
-                        #                 y_new_colision == coordonnees_prochain_mouvement[idx_coordonnees + 1]:
-                        #             collision = True
-                        #     for item in grille_live.cases[y_new_colision][x_new_colision]:
-                        #         if isinstance(item, Bras) or isinstance(item, PointMontage):
-                        #             collision = True
-                        # if collision:
-                        #     collision = False
-                        #     x_new_colision, y_new_colision = robot.coordonnees_pince().get_position(
-                        #         prochain_mouvement.rotation_90(2))
-                        #     if not grille_live.dans_grille(x_new_colision, y_new_colision):
-                        #         collision = True
-                        #     else:
-                        #         for idx_coordonnees in range(0, len(coordonnees_prochain_mouvement), 2):
-                        #             if x_new_colision == coordonnees_prochain_mouvement[idx_coordonnees] and \
-                        #                     y_new_colision == coordonnees_prochain_mouvement[idx_coordonnees + 1]:
-                        #                 collision = True
-                        #         for item in grille_live.cases[y_new_colision][x_new_colision]:
-                        #             if isinstance(item, Bras) or isinstance(item, PointMontage):
-                        #                 collision = True
-                        #     if collision:
-                        #         prochain_mouvement = Mouvement.ATTENDRE
-                        #     else:
-                        #         prochain_mouvement = prochain_mouvement.rotation_90(2)
-                        #
-                        # else:
-                        #     prochain_mouvement = prochain_mouvement.rotation_90()
 
                     # recherche d'un chemin plus optimisé
                     if prochain_mouvement == Mouvement.ATTENDRE:

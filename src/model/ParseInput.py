@@ -25,7 +25,7 @@ class ParseInput:
         """
 
         # file_path = '/polyhash-2020/data/input/' + input('Entrer le nom du fichier à tester')
-        # test si file_path est un fichier
+        # tests si file_path est un fichier
         assert os.path.isfile(file_path)
 
         with open(file_path, 'r') as file:

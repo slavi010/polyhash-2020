@@ -66,7 +66,7 @@ class ItemCase:
     def distance(self, other):
         """Calcule la distance entre cet objet et other à vol d'oiseaux
 
-        TODO test
+        TODO tests
         """
         assert other is not None
 
@@ -75,7 +75,7 @@ class ItemCase:
     def surface(self, other):
         """Calcule la surface entre cette objet et other en un rectangle
 
-        TODO test
+        TODO tests
         """
         assert other is not None
 

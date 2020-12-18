@@ -19,6 +19,7 @@ import argparse
 #     def run(self) -> None:
 from src.model.TypeMap import TypeMap
 
+
 def required_length(nmin,nmax, sort: bool = False):
     class RequiredLength(argparse.Action):
         def __call__(self, parser, args, values, option_string=None):
@@ -46,7 +47,8 @@ def required_length_in(ns, sort: bool = False):
             setattr(args, self.dest, values)
     return RequiredLength
 
-def param_from_arg(args_dic: dict, param_name: str, nb_value: int, map: TypeMap):
+
+def param_from_arg(args_dic: dict, param_name: str, nb_value: int, map_chose: TypeMap, type):
     params = {
         TypeMap.C: {'MAX_STUCK': 10,
                     'MAX_DIST_PM': random.randint (150, 400),
@@ -70,21 +72,30 @@ def param_from_arg(args_dic: dict, param_name: str, nb_value: int, map: TypeMap)
     param = 0
 
     if args_dic[param_name] is not None and len (args_dic[param_name]) > 0:
-        if len (args_dic[param_name]) == nb_value:
-            param = args_dic[param_name][0] if len (args_dic[param_name]) == 1 \
-                else random.randint (args_dic[param_name][0], args_dic[param_name][1])
+        if len (args_dic[param_name]) == 1 or (len (args_dic[param_name]) == 2 and nb_value == 1):
+            if type == int:
+                param = args_dic[param_name][0] if len (args_dic[param_name]) == 1 \
+                    else random.randint (args_dic[param_name][0], args_dic[param_name][1])
+            else:
+                param = args_dic[param_name][0] if len (args_dic[param_name]) == 1 \
+                    else random.random()*(args_dic[param_name][1] - args_dic[param_name][0]) + args_dic[param_name][0]
 
         else:
             param = []
             for i in range(nb_value):
-                param.append(args_dic[param_name][i*2] if len (args_dic[param_name]) == nb_value \
-                    else random.randint (args_dic[param_name][i*2], args_dic[param_name][i*2 + 1]))
+                if type == int:
+                    param.append (args_dic[param_name][i] if len (args_dic[param_name]) == nb_value \
+                                      else random.randint (args_dic[param_name][i * 2],args_dic[param_name][i * 2 + 1]))
+                else:
+                    param.append (args_dic[param_name][i] if len (args_dic[param_name]) == nb_value \
+                                    else random.random () * (args_dic[param_name][i * 2 + 1] - args_dic[param_name][i * 2]) + \
+                                         args_dic[param_name][i * 2])
     else:
         if map_chose in params:
             param = params[map_chose][param_name]
         else:
             raise argparse.ArgumentTypeError (
-                f"argument {param_name} must be given with at less {nb_value} value for map {map_chose.name}")
+                f"argument --{param_name} must be given with at less {nb_value} value for map {map_chose.name}")
 
     return param
 
@@ -93,7 +104,8 @@ def param_from_arg(args_dic: dict, param_name: str, nb_value: int, map: TypeMap)
 
 if __name__ == "__main__":
     my_parser = argparse.ArgumentParser (
-        description='Retourne des solutions pour le polyhash 2020'
+        description='Retourne des solutions pour le polyhash 2020.'
+                    ''
     )
 
     my_parser.add_argument ('-m', '--map',
@@ -131,7 +143,7 @@ if __name__ == "__main__":
 
     my_parser.add_argument ('--ADDITION',
                             help='les quatres facteurs d\'additions lors du choix d\'une tache'
-                                 ' (float, si 8 valeurs sont données, prend une valeur aléatoire pour chaque paire)',
+                                 ' (float, si 8 valeurs sont données, prend une valeur aléatoire entre chaque paire)',
                             type=float,
                             nargs='*',
                             action=required_length_in([0, 4, 8], True))
@@ -167,7 +179,7 @@ if __name__ == "__main__":
         if affichage_console:
             print ('Affichage : graphique et console')
         else:
-            print ('Affichage : graphique et console')
+            print ('Affichage : graphique')
     else:
         if affichage_console:
             print ('Affichage : graphique et console')
@@ -179,24 +191,27 @@ if __name__ == "__main__":
 
     best = [None, 0]
 
-    for i in range(iteration):
-        MAX_STUCK = param_from_arg(args_dic, 'MAX_STUCK', 1, map_chose)
-        MAX_DIST_PM = param_from_arg(args_dic, 'MAX_DIST_PM', 1, map_chose)
-        ADDITION = param_from_arg(args_dic, 'ADDITION', 4, map_chose)
-        FACTEUR_CONCENTRATION_BRAS = param_from_arg(args_dic, 'FACTEUR_CONCENTRATION_BRAS', 1, map_chose)
+    if map_chose == TypeMap.A:
+        ExportOutput().exportA()
+    else:
+
+        for i in range(iteration):
+            MAX_STUCK = param_from_arg(args_dic, 'MAX_STUCK', 1, map_chose, int)
+            MAX_DIST_PM = param_from_arg(args_dic, 'MAX_DIST_PM', 1, map_chose, int)
+            ADDITION = param_from_arg(args_dic, 'ADDITION', 4, map_chose, float)
+            FACTEUR_CONCENTRATION_BRAS = param_from_arg(args_dic, 'FACTEUR_CONCENTRATION_BRAS', 1, map_chose, float)
 
 
-        print(f'  MAX_STUCK = {MAX_STUCK}')
-        print(f'  MAX_DIST_PM = {MAX_DIST_PM}')
-        print(f'  ADDITION = {ADDITION}')
-        print(f'  FACTEUR_CONCENTRATION_BRAS = {FACTEUR_CONCENTRATION_BRAS}')
-        grille_solution = resolv.methode_naive(grille, map_chose, MAX_STUCK, 30, MAX_DIST_PM, ADDITION, FACTEUR_CONCENTRATION_BRAS,
-                                               affichage_graphique=affichage_graphique, affichage_console=affichage_console)
-        print(i," points: ", grille_solution.points//1000, " K, ADDITION: ", ADDITION, ", MAX_STUCK: ", MAX_STUCK)
+            print(f'  MAX_STUCK = {MAX_STUCK}')
+            print(f'  MAX_DIST_PM = {MAX_DIST_PM}')
+            print(f'  ADDITION = {ADDITION}')
+            print(f'  FACTEUR_CONCENTRATION_BRAS = {FACTEUR_CONCENTRATION_BRAS}')
+            grille_solution = resolv.methode_naive(grille, map_chose, MAX_STUCK, 30, MAX_DIST_PM, ADDITION, FACTEUR_CONCENTRATION_BRAS,
+                                                   affichage_graphique=affichage_graphique, affichage_console=affichage_console)
+            print(i," points: ", grille_solution.points//1000, " K, ADDITION: ", ADDITION, ", MAX_STUCK: ", MAX_STUCK)
 
-        if grille_solution.points > best[1]:
-            best[1] = grille_solution.points
-            best[0] = grille_solution
-            print("best_points: ", best[1]//1000, " K")
-            ExportOutput().exportOutput(best[0], os.path.basename(map_chose.get_path()) + "_" + str(best[1]) + ".out")
-
+            if grille_solution.points > best[1]:
+                best[1] = grille_solution.points
+                best[0] = grille_solution
+                print("best_points: ", best[1] if best[1] < 1000 else str(best[1]//1000) + " K")
+                ExportOutput().exportOutput(best[0], os.path.basename(map_chose.get_path()) + "_" + str(best[1]) + ".out")

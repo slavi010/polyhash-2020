@@ -1,5 +1,5 @@
 
-"""Toutes les fonctions de test de l'application"""
+"""Toutes les fonctions de tests de l'application"""
 from src.model.Bras import Bras
 from src.model.Etape import Etape
 from src.model.Grille import Grille

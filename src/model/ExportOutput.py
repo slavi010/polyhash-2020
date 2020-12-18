@@ -96,49 +96,47 @@ class ExportOutput:
         #fermeture fichier output
         output.close()
 
+    def exportA(self):
+        grille = ParseInput().parse(TypeMap.A.get_path())
+        robot1 = grille.robots[0]
+        pm1 = None
+        pm2 = None
+        for point_montage in grille.point_montages:
+            if point_montage.x == 1 and point_montage.y == 3:
+                pm1 = point_montage
+
+            elif point_montage.x == 3 and point_montage.y == 2:
+                pm2 = point_montage
+
+        tache1 = -1
+        tache2 = -1
+        tache3 = -1
+        for tache in grille.taches:
+            if tache.numero == 0:
+                tache1 = tache
+
+            elif tache.numero == 1:
+                tache2 = tache
+            elif tache.numero == 2:
+                tache3 = tache
+
+        #if pm1 is not None and pm2 is not None and -1 != tache1 and -1 != tache2 and -1 != tache3:
+        robot1.point_montage = pm1
+        robot1.add_tache(tache1, grille)
+        robot1.add_tache(tache3, grille)
+        robot1.mouvements.append(Mouvement.DROITE)
+        robot1.mouvements.append(Mouvement.DROITE)
+        robot1.mouvements.append(Mouvement.ATTENDRE)
+
+        robot2 = grille.robots[1]
+        robot2.point_montage = pm2
+        robot2.add_tache(tache2, grille)
+        robot2.mouvements.append(Mouvement.DROITE)
+        robot2.mouvements.append(Mouvement.BAS)
+        robot2.mouvements.append(Mouvement.BAS)
+
+        ExportOutput().exportOutput(grille, "a.out")
 
 
-if __name__ == "__main__":
-    grille = ParseInput().parse(TypeMap.A.get_path())
-    robot1 = grille.robots[0]
-    pm1 = None
-    pm2 = None
-    for point_montage in grille.point_montages:
-        if point_montage.x == 1 and point_montage.y == 3:
-            pm1 = point_montage
-
-        elif point_montage.x == 3 and point_montage.y == 2:
-            pm2 = point_montage
-
-    tache1 = -1
-    tache2 = -1
-    tache3 = -1
-    for tache in grille.taches:
-        if tache.numero == 0:
-            tache1 = tache
-
-        elif tache.numero == 1:
-            tache2 = tache
-        elif tache.numero == 2:
-            tache3 = tache
-
-    #if pm1 is not None and pm2 is not None and -1 != tache1 and -1 != tache2 and -1 != tache3:
-    robot1.point_montage = pm1
-    robot1.add_tache(tache1, grille)
-    robot1.add_tache(tache3, grille)
-    robot1.mouvements.append(Mouvement.DROITE)
-    robot1.mouvements.append(Mouvement.DROITE)
-    robot1.mouvements.append(Mouvement.ATTENDRE)
-
-    robot2 = grille.robots[1]
-    robot2.point_montage = pm2
-    robot2.add_tache(tache2, grille)
-    robot2.mouvements.append(Mouvement.DROITE)
-    robot2.mouvements.append(Mouvement.BAS)
-    robot2.mouvements.append(Mouvement.BAS)
-
-    ExportOutput().exportOutput(grille, "a.out")
-
-
-    #else:
-     #   print("Problème sur les points de montages ou les tâches")
+        #else:
+         #   print("Problème sur les points de montages ou les tâches")

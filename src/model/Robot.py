@@ -123,7 +123,7 @@ class Robot:
     def is_stuck(self, x_new: int, y_new: int):
         """Détecte si le robot refait le même mouvement
 
-        TODO test
+        TODO tests
 
         Retourne vrai si oui.
         Augmente la valeur d'élergissement.
@@ -178,7 +178,7 @@ class Robot:
 
         Supprime la tache s'il n'y a plus d'étape. (et ajoute les points à la grille)
 
-        TODO test
+        TODO tests
 
         :param grille: La grille
         """
