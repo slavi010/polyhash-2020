@@ -326,7 +326,6 @@ class Grille:
 
         #openList liste cases à évaluer
         openList : list = []
-        # openList.append(depart_coord)
 
         #closeList liste cases déjà évaluées
         closeList = set()
@@ -374,10 +373,8 @@ class Grille:
                     continue
                 if 0 <= coord_voisin_relatif[0] < len(carte[0]):
                     if not (0 <= coord_voisin_relatif[1] < len(carte)):
-                        # array bound y walls
                         continue
                 else:
-                    # array bound x walls
                     continue
 
                 # si on ne peux pas traverser le voisin ou que le voisin est dans DONE

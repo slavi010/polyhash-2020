@@ -10,10 +10,3 @@ setup(
     author='Sviatoslav BESNARD, Chama EL MAJENA, Aurelie BOULAIS, Rémis BORIUS',
     author_email='etudiant@slavi.dev',
 )
-
-
-# src : https://stackoverflow.com/questions/17001010/how-to-run-unittest-discover-from-python-setup-py-test/23307488
-# def my_test_suite():
-#     test_loader = unittest.TestLoader()
-#     test_suite = test_loader.discover('tests', pattern='test_*.py')
-#     return test_suite

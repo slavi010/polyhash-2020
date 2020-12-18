@@ -69,10 +69,6 @@ def methode_naive(
         raise ValueError(f'Il y a {nb_robot_sans_pm} robot(s) qui n\'ont pas de point de montage assigné. '
                          f'Pensez à réduire la valeur de FACTEUR_DISTANCE_RETRACTATION.')
 
-
-    # for i in range(len(grille.robots) - 100):
-    #     grille.robots.pop(random.randint(0, len(grille.robots) - 1))
-
     # la grille qui va en live tester les solutions
     grille_live = copy.deepcopy(grille)
 
@@ -108,19 +104,10 @@ def methode_naive(
                 # oblige la rétractation après finition d'une tâche
 
                 # prochaine tâche
-                # prochaine_tache = robot.get_tache_plus_rentable(grille_live)
                 intersection_min = 9999999
                 prochaine_tache: Tache = None
                 facteur_max = 999999
                 distance_pince_min = 999999
-
-                # calcule
-                # for robot_for_tache in grille_live.robots:
-                #     if len(robot_for_tache.taches):
-                #         tache = robot_for_tache.taches[0]
-                #         tache.etapes[0].temps = robot_for_tache.coordonnees_pince().distance(tache.etapes[0])
-                #         for etape_from, etape_to in zip(tache.etapes[0::1], tache.etapes[1::1]):
-                #             etape_to.temps = etape_from.distance(etape_to) + etape_from.temps
 
                 for tache in grille_live.taches:
                     intersection = 0
@@ -128,84 +115,6 @@ def methode_naive(
                         intersection += 99999
                         facteur += 999999
 
-                    # intersection entre la tâche et les étapes
-                    # tache.etapes[0].temps = pince.distance(tache.etapes[0])
-                    # for etape_from, etape_to in zip(tache.etapes[0::1], tache.etapes[1::1]):
-                    #     etape_to.temps = etape_from.distance(etape_to) + etape_from.temps
-                    # tache.etapes[-1].temps_aller_retour = tache.etapes[-1].temps
-                    # if len(tache.etapes) >= 2:
-                    #     for etape_to, etape_from in zip(tache.etapes[-1:1:-1], tache.etapes[-2:0:-1]):
-                    #         etape_from.temps_aller_retour = etape_to.temps_aller_retour \
-                    #                                         + etape_to.temps - etape_from.temps
-                    #     tache.etapes[0].temps_aller_retour = tache.etapes[1].temps_aller_retour \
-                    #                                          + tache.etapes[1].temps - tache.etapes[0].temps
-
-                    # etapes = []
-                    # for etape in robot.etapes_done:
-                    #     etapes.append(etape)
-                    # etapes.append(pince)
-                    # for etape in tache.etapes:
-                    #     etapes.append(etape)
-                    #
-                    # for robot_for_tache in grille_live.robots:
-                    #     robot_for_tache_pince = robot_for_tache.coordonnees_pince()
-                    #
-                    #     etapes_robot = []
-                    #     for etape in robot_for_tache.etapes_done:
-                    #         etapes_robot.append(etape)
-                    #     etapes_robot.append(robot_for_tache_pince)
-                    #     for tache_robot in robot_for_tache.taches:
-                    #         for etape_robot in tache_robot.etapes:
-                    #             etapes_robot.append(etape_robot)
-                    #
-                    #     for etape_from, etape_to in zip(etapes[0::1], etapes[1::1]):
-                    #         for robot_etape_from, robot_etape_to in zip(etapes_robot[0::1], etapes_robot[1::1]):
-                    #             if intersect_rectangle(etape_from, etape_to, robot_etape_from, robot_etape_to):
-                    #                 # if robot_etape_from.temps < etape_from.temps_aller_retour + 1:
-                    #                 intersection += 1
-
-                    # for etape_from_1, etape_to_1 in zip(tache.etapes[0::1], tache.etapes[1::1]):
-                    #     for etape_from_2, etape_to_2 in zip(tache.etapes[0::1], tache.etapes[1::1]):
-                    #         if etape_to_1 != etape_from_2 and etape_to_2 != etape_from_1 and etape_from_1 != etape_from_2:
-                    #             if intersect_rectangle(etape_from_1, etape_to_1, etape_from_2, etape_to_2):
-                    #                 intersection += 1
-
-                    # for etape_from, etape_to in zip(tache.etapes[0::1], tache.etapes[1::1]):
-                    #     for robot_for_tache in grille_live.robots:
-                    #         robot_for_tache_pince = robot_for_tache.coordonnees_pince()
-                    #         for tache_robot in robot_for_tache.taches:
-                    #             for robot_etape_from, robot_etape_to in zip(tache_robot.etapes[0::1],
-                    #                                                         tache_robot.etapes[1::1]):
-                    #                 if intersect_rectangle(etape_from, etape_to, robot_etape_from, robot_etape_to):
-                    #                     # if robot_etape_from.temps < etape_from.temps_aller_retour + 1:
-                    #                     intersection += 1
-                    #                 # pince vers première étape
-                    #                 if intersect_rectangle(pince, tache.etapes[0], robot_etape_from, robot_etape_to):
-                    #                     intersection += 1
-                    #         if len(robot_for_tache.taches) and intersect_rectangle(pince, tache.etapes[0], robot_for_tache_pince, robot_for_tache.taches[0].etapes[0]):
-                    #             intersection += 1
-                    #         # etapes déjà faites pour chaque robots
-                    #         for robot_etape_from, robot_etape_to in zip(robot_for_tache.etapes_done[0::1],
-                    #                                                     robot_for_tache.etapes_done[1::1]):
-                    #             if intersect_rectangle(etape_from, etape_to, robot_etape_from, robot_etape_to):
-                    #                 intersection += 1
-                    #             if etape_from == etape_to:
-                    #                 intersection += 1
-                    #         # au niveau du bras
-                    #         if (len(robot_for_tache.taches) and intersect_rectangle(etape_from, etape_to,
-                    #                                                       robot_for_tache.coordonnees_pince(),
-                    #                                                       robot_for_tache.taches[0].etapes[0])) \
-                    #                 or (len(robot_for_tache.etapes_done) and intersect_rectangle(etape_from, etape_to,
-                    #                                                            robot_for_tache.coordonnees_pince(),
-                    #                                                            robot_for_tache.etapes_done[-1])):
-                    #             intersection += 1
-                    # for etape_from_1, etape_to_1 in zip(tache.etapes[0::1], tache.etapes[1::1]):
-                    #     for etape_from_2, etape_to_2 in zip(tache.etapes[0::1], tache.etapes[1::1]):
-                    #         if etape_to_1 != etape_from_2 and etape_to_2 != etape_from_1 and etape_from_1 != etape_from_2:
-                    #             if intersect_rectangle(etape_from_1, etape_to_1, etape_from_2, etape_to_2):
-                    #                 intersection += 1
-
-                    # facteur = tache.etapes[0].surface(robot.point_montage)
                     facteur = tache.distance + tache.etapes[0].distance(robot.point_montage)
                     facteur = facteur/tache.points
 
@@ -481,28 +390,3 @@ def methode_naive(
         print("Points : ", grille_live.points)
     grille_solution.points = grille_live.points
     return grille_solution
-
-
-def ccw(A: ItemCase, B: ItemCase, C: ItemCase):
-    return (C.y - A.y) * (B.x - A.x) > (B.y - A.y) * (C.x - A.x)
-
-
-# Retourne True si les segments AB et CD s'intersectent
-def intersect(A: ItemCase, B: ItemCase, C: ItemCase, D: ItemCase):
-    return ccw(A, C, D) != ccw(B, C, D) and ccw(A, B, C) != ccw(A, B, D)
-
-
-
-def intersect_rectangle(A: ItemCase, B: ItemCase, C: ItemCase, D: ItemCase):
-    x_min = A.x if A.x < B.x else B.x
-    x_max = A.x if A.x > B.x else B.x
-    y_min = A.y if A.y < B.y else B.y
-    y_max = A.y if A.y > B.y else B.y
-    pts = [(C.x, C.y), (D.x, D.y), (C.x, D.y), (D.x, C.y)]
-    for pt in pts:
-        if x_min < pt[0] < x_max and y_min < pt[1] < y_max:
-            return False
-
-    # if B.x < C.x or D.x < A.x or B.y < C.y or D.y < A.y:
-    #     return False
-    return True

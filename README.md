@@ -10,6 +10,14 @@ Pour ce projet, nous avons cherché à résoudre le problème posé lors du Goog
 * Chama EL MAJENY
 * Remy BORIUS
 
+# Installation
+Version de python testée : `3.8.6`
+
+Installez toutes les dépendances  du fichier requirements.txt :
+````bash
+pip install -r requirements.txt
+````
+
 # Quick start
 Pour lancer une recherche de solution sur la carte A (ou fichier d'input A) lancez :
 ```bash
@@ -44,11 +52,11 @@ python main.py -m F --MAX_STUCK 10 20
 Ici ```MAX_STUCK``` prendra une valeur aléatoire entre 10 et 20 avec une distribution uniforme.
 
 ## Itération
-L'option ```--iteration``` (ou ```-i```) permet de spécifier au programme le nombre de fois qu'il doit exécuter la recherche de solution. Chaque solution trouvée sera enregistrée dans un fichier avec son score correspondant. Il est préférable d'utiliser cette option en conjonction de spécifier aux paramètres de la simulation des valeurs dans un intervale.
+L'option ```--iteration``` (ou ```-i```) permet de spécifier au programme le nombre de fois qu'il doit exécuter la recherche de solution. Chaque solution trouvée sera enregistrée dans un fichier avec son score correspondant. Il est préférable d'utiliser cette option en spécifiant aux paramètres de la simulation des valeurs aléatoires dans un intervalle.
 
 ## Affichage
 ### Console
-L'option ```--verbose``` (ou ```-v```) permet d'afficher plus de détail dans la console. Notamment un pourcentage d'avancement de la recherche de solution en cours.
+L'option ```--verbose``` (ou ```-v```) permet d'afficher plus de détails dans la console. Notamment un pourcentage d'avancement de la recherche de solution en cours.
 ### Graphique
 Pour afficher l'interface graphique qui affiche la recherche de solution en temps réel, il faut utiliser l'option ```--graphique``` (ou ```-g```).
 Attention ! L'affichage de cette interface va diminuer de manière drastique la vitesse d'exécution.

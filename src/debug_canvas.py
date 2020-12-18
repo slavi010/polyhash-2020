@@ -61,15 +61,6 @@ class DebugCanvas:
             img=self.img.copy()
             self.draw = ImageDraw.Draw(img)
 
-            #--------- The following part depends on your data structures so here it is just an example ----------#
-
-            # debug : draw occupied cells in purple
-            #for y in range(self.grille.height):
-            #    for x in range(self.grille.width):
-            #        if self.grille.robots_map[y][x] > 0:
-            #            self.draw.rectangle([x*self.cell_size, y*self.cell_size, x*self.cell_size+self.cell_size, y*self.cell_size+self.cell_size], fill='purple')
-
-
             for robot in self.grille.robots:
                 pince = robot.coordonnees_pince()
                 for tache in robot.taches:
@@ -82,18 +73,6 @@ class DebugCanvas:
             pt : ItemCase
             for pt in self.grille.point_montages:
                 self.draw.ellipse([pt.x*self.cell_size, pt.y*self.cell_size, pt.x*self.cell_size+self.cell_size, pt.y*self.cell_size+self.cell_size], fill='grey')
-
-            # then assembly points (color depends on their state)
-            # tache : Tache
-            # for tache in self.grille.taches:
-            #     for i in range(min(tache.etapes[0]+1,len(tache.assembly_points))):
-            #         if i < tache.current_assembly_point:
-            #             fill_c = 'green'
-            #         elif i == tache.current_assembly_point:
-            #             fill_c = 'red'
-            #
-            #         pt = tache.assembly_points[i]
-            #         self.draw.rectangle([pt.x*self.cell_size, pt.y*self.cell_size, pt.x*self.cell_size+self.cell_size, pt.y*self.cell_size+self.cell_size], fill=fill_c)
 
             robot: Robot
             # then robots mount points (blue circles)
@@ -127,6 +106,5 @@ class DebugCanvas:
             self.label.configure(image=self.PhotoImage)
             self.label.update()
             # We can same the image if we want (to create an animated GIF ?)
-            #img.save("debug/{:4d}.jpg".format(self.cpt))
         except:
             pass
