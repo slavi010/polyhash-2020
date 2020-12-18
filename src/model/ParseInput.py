@@ -1,6 +1,5 @@
 import os
 from typing import List
-import math
 
 from src.model.Etape import Etape
 from src.model.Grille import Grille
@@ -11,7 +10,9 @@ from src.model.Tache import Tache
 
 
 class ParseInput:
-    """Parser qui permet de lire le fichier texte d'input fourni par Google."""
+    """Parser qui permet de lire le fichier texte d'input fourni par Google.
+    Va transformer ce fichier en données et classes exploitables pour nous
+     """
 
     grille: Grille
 
@@ -24,7 +25,6 @@ class ParseInput:
         :rtype: Grille
         """
 
-        # file_path = '/polyhash-2020/data/input/' + input('Entrer le nom du fichier à tester')
         # tests si file_path est un fichier
         assert os.path.isfile(file_path)
 
@@ -70,10 +70,12 @@ class ParseInput:
                 g_x = 0
                 g_y = 0
                 for index_etape in range(lines[index-1][1]):
+                    #ajoute les étapes
                     etape = Etape(lines[index][index_etape*2+0], lines[index][index_etape*2+1])
                     tache_tampon.add_etape(etape)
                     g_x += (etape.x - g_x)/len(tache_tampon.etapes)
                     g_y += (etape.y - g_y)/len(tache_tampon.etapes)
+                #ajoute les paramètres dans la classe tache
                 tache_tampon.centre_gravite = ItemCase(int(g_x), int(g_y))
                 tache_tampon.distance_centre_gravite = max(tache_tampon.etapes,
                                                            key=lambda etape: tache_tampon.centre_gravite.distance(etape)) \

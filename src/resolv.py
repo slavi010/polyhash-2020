@@ -6,11 +6,6 @@ import os
 import random
 from typing import Tuple
 
-from pathfinding.core.diagonal_movement import DiagonalMovement
-from pathfinding.core.grid import Grid
-from pathfinding.finder.a_star import AStarFinder
-from pathfinding.finder.dijkstra import DijkstraFinder
-
 from src.debug_canvas import DebugCanvas
 from src.model.Bras import Bras
 from src.model.Grille import Grille
@@ -19,6 +14,7 @@ from src.model.Mouvement import Mouvement
 from src.model.PointMontage import PointMontage
 from src.model.Tache import Tache
 from src.model.TypeMap import TypeMap
+
 
 # méthode (plus si naive que ça ) pour répondre au problème
 def methode_naive(
@@ -36,41 +32,8 @@ def methode_naive(
 
     random.shuffle(grille.point_montages)
 
-    # assigne les point de montage aux robots
-    # grille.robots[0].point_montage = grille.point_montages[0]
-    # for idx_robot in range(len(grille.robots)):
-    #     point_montage_max: PointMontage = None
-    #     distance_max = 0
-    #     for point_montage in grille.point_montages:
-    #         distance_min = 9999
-    #         for idx_robot_2 in range(idx_robot):
-    #             if distance_min > point_montage.distance(grille.robots[idx_robot_2].point_montage):
-    #                 distance_min = point_montage.distance(grille.robots[idx_robot_2].point_montage)
-    #         if distance_min > distance_max:
-    #             point_montage_max = point_montage
-    #             distance_max = distance_min
-    #     grille.robots[idx_robot].point_montage = point_montage_max
-    #     # grille.robots[idx_robot].point_montage = grille.point_montages[idx_robot]
-
-    # f_decentralized
-    # point_montage_deja_pris = []
-    # for idx_robot in range(len(grille.robots)):
-    #     point_montage_min: PointMontage = None
-    #     distance_min = 9999999
-    #     for point_montage in grille.point_montages:
-    #         ok = True
-    #         for pm in point_montage_deja_pris:
-    #             if pm == point_montage:
-    #                 ok = False
-    #         if ok:
-    #             distance = min(point_montage.x, grille.longueur - point_montage.x, point_montage.y, grille.hauteur - point_montage.y)
-    #             if distance_min > distance:
-    #                 point_montage_min = point_montage
-    #                 distance_min = distance
-    #     point_montage_deja_pris.append(point_montage_min)
-    #     grille.robots[idx_robot].point_montage = point_montage_min
-
-    # c_few_arms
+###################################################################################################
+# Choix des points de montage pour chaque robot
     point_montage_deja_pris = []
     for idx_robot in range(len(grille.robots)):
         point_montage_min: PointMontage = None
@@ -112,6 +75,7 @@ def methode_naive(
 
     # la grille qui va en live tester les solutions
     grille_live = copy.deepcopy(grille)
+
     # la grille qui contien la solution
     grille_solution = copy.deepcopy(grille)
 
@@ -121,7 +85,7 @@ def methode_naive(
 
     stated_time = os.times()[0]
 
-    # assigne les taches et fait les démos
+    # assigne les taches et fait les démonstration de nos fichiers
     while grille_live.step_simulation > 0:
         coordonnees_prochain_mouvement = []
 
@@ -136,6 +100,9 @@ def methode_naive(
 
             if robot.stucks == MAX_STUCK:
                 robot.mouvements.clear()
+
+###################################################################################################
+# Choix de la prochaine tâche
 
             if not len(robot.taches) and len(grille_live.taches):
                 # oblige la rétractation après finition d'une tâche
@@ -161,7 +128,7 @@ def methode_naive(
                         intersection += 99999
                         facteur += 999999
 
-                    # # intersection entre la tâche et les étapes
+                    # intersection entre la tâche et les étapes
                     # tache.etapes[0].temps = pince.distance(tache.etapes[0])
                     # for etape_from, etape_to in zip(tache.etapes[0::1], tache.etapes[1::1]):
                     #     etape_to.temps = etape_from.distance(etape_to) + etape_from.temps
@@ -243,7 +210,6 @@ def methode_naive(
                     facteur = facteur/tache.points
 
 
-                    # f et e
                     max_distance_from_pm = 0
                     for etape in tache.etapes:
                         distance = etape.distance(robot.point_montage)
@@ -268,19 +234,23 @@ def methode_naive(
                               ", min intersection: ", intersection_min, ", facteur: ", int(facteur_max), ", ",
                               prochaine_tache.points, " points")
 
-                    # ajoute une nouvelle tâche
+                    # ajoute une nouvelle tâche au robot
                     robot.add_tache(prochaine_tache, grille_live)
+
                     # on essaye de retrouver la tache corrspondante dans grille_solve
                     for tache in grille_solution.taches:
                         if tache == prochaine_tache:
                             grille_solution.robots[idx_robot].add_tache(prochaine_tache, grille_solution)
 
+
+###################################################################################################
+# Choix du prochain mouvement du robot
             prochain_mouvement: Mouvement = Mouvement.ATTENDRE
 
             if len(robot.taches) and robot.stucks < MAX_STUCK:
-                # toujours d'actu?
+                # Reste-t-il des mouvements déjà déterminés pour le robot ?
                 if len(robot.mouvements):
-                    # collision ?
+                    # Recherche d'une collision ? Si oui, il faut retrouver un autre chemin
                     collision = False
                     x_new, y_new = robot.coordonnees_pince().get_position(robot.mouvements[0])
 
@@ -294,27 +264,37 @@ def methode_naive(
                         if isinstance(item, Bras) or isinstance(item, PointMontage):
                             collision = True
 
+                    #si collision, la liste des mouvements est effacées
                     if collision:
                         robot.mouvements.clear()
                     else:
+                        # si pas de collision alors on fait le prochain mouvement
                         prochain_mouvement = robot.mouvements[0]
 
                 # se rétracter est plus intéressant ?
                 retractation = False
-                if len(robot.taches):
+                if len(robot.taches) and not len(robot.mouvements):
+                    # recherche de la distance entre la pince à l'étape
                     distance_pince_etape = pince.distance(robot.taches[0].etapes[0])
+
+                    # si une autre case occupée par le bras du robot est plus proche de la tâche alors le robot se rétracte
                     for idx_bras, bras in enumerate(robot.bras[::(len(robot.bras)//10 + 1)]):
                         if bras.distance(robot.taches[0].etapes[0]) + (len(robot.bras) - idx_bras)/FACTEUR_DISTANCE_RETRACTATION < distance_pince_etape:
                             retractation = True
 
+#########################
+# path-finding simple
+                # y a-t-il des mouvements pré-déffini ou une rétractation ?
                 if not len(robot.mouvements) and not retractation:
-
 
                     # il y a une tâche à accomplir
                     # bouge vers l'etape correspondante
 
                     x_diff: int = robot.taches[0].etapes[0].x - pince.x
                     y_diff: int = robot.taches[0].etapes[0].y - pince.y
+
+                    # chemin vers la tâche est recherché en fonction de la distance entre les coordonées
+                    # du robot et les coordonées de l'étape
 
                     if abs(x_diff) > abs(y_diff):
                         # en x
@@ -341,16 +321,19 @@ def methode_naive(
                         if x_new == coordonnees_prochain_mouvement[idx_coordonnees] and \
                                 y_new == coordonnees_prochain_mouvement[idx_coordonnees + 1]:
                             collision = True
-                    # om y a un bras ou un point de montage présent sur cette case ?
+
+                    # il y a un bras ou un point de montage présent sur cette case ?
                     for item in grille_live.cases[y_new][x_new]:
                         if isinstance(item, Bras) or isinstance(item, PointMontage):
                             collision = True
 
+                    # en cas de collision, attendre pendant un tour
                     if collision:
-
                         prochain_mouvement = Mouvement.ATTENDRE
 
-                    # recherche d'un chemin plus optimisé
+#########################
+# path-finding A*
+                    # recherche d'un chemin plus optimisé, toujours à l'aide de la distance entre le robot et l'étape
                     if prochain_mouvement == Mouvement.ATTENDRE:
                         x_min = max((pince.x if pince.x < robot.taches[0].etapes[0].x else robot.taches[0].etapes[0].x) - (
                                 1 + robot.elargissement), 0)
@@ -361,6 +344,7 @@ def methode_naive(
                         y_max = min((pince.y if pince.y >= robot.taches[0].etapes[0].y else robot.taches[0].etapes[0].y) + (
                                 1 + robot.elargissement), grille_live.hauteur - 1)
                         matrix = grille_live.to_matrix(x_min, y_min, x_max, y_max, robot)
+
                         # ajoute les prochains mouvements déjà programmé des autres bras
                         for idx_coordonnees in range(0, len(coordonnees_prochain_mouvement), 2):
                             if x_min <= coordonnees_prochain_mouvement[idx_coordonnees] <= x_max and \
@@ -368,33 +352,14 @@ def methode_naive(
                                 matrix[coordonnees_prochain_mouvement[idx_coordonnees + 1] - y_min] \
                                     [coordonnees_prochain_mouvement[idx_coordonnees] - x_min] = -1
 
-
-
-                        # grid = Grid(matrix=matrix)
-                        # start = grid.node(pince.x - x_min, pince.y - y_min)
-                        # end = grid.node(robot.taches[0].etapes[0].x - x_min, robot.taches[0].etapes[0].y - y_min)
-                        # finder = AStarFinder(diagonal_movement=DiagonalMovement.only_when_no_obstacle)
-                        # path, runs = finder.find_path(start, end, grid)
-
                         start = robot.coordonnees_pince()
                         end = robot.taches[0].etapes[0]
                         path = grille_live.pathfinder(start, end, robot.bras, matrix, x_min, y_min)
 
 
-
-
-                        # print(x_min, y_min, x_max, y_max)
-                        # print(runs, path)
-                        # print(grid.grid_str(path=path, start=start, end=end, show_weight=False))
-
                         if path is not None:
                             for index_path in range(0, len(path)):
-                                # if 0 == path[index_path][0] and 209 == path[index_path][1]:
-                                #     for line in matrix:
-                                #         print(line)
-                                #     print(path)
-                                #     print(grille_live)
-                                #     print("ok")
+
 
                                 prochain_mouvement: Mouvement
 
@@ -430,6 +395,8 @@ def methode_naive(
                 prochain_mouvement = robot.mouvements[0]
 
             if prochain_mouvement == Mouvement.ATTENDRE:
+#########################
+# rétractation
                 # supprime les étapes déjà visité lors de la rétractation
                 if len(robot.bras) and len(robot.etapes_done) and robot.bras[-1] == robot.etapes_done[-1]:
                     robot.etapes_done.pop()
@@ -459,7 +426,7 @@ def methode_naive(
 
 
 
-
+            #changement des coordonées du robot
             x_new, y_new = robot.coordonnees_pince().get_position(prochain_mouvement)
             coordonnees_prochain_mouvement.append(x_new)
             coordonnees_prochain_mouvement.append(y_new)
@@ -468,17 +435,27 @@ def methode_naive(
                 robot.mouvements.append(prochain_mouvement)
             grille_solution.robots[idx_robot].mouvements.append(prochain_mouvement)
 
-
+###################################################################################################
+# Avancement dans la simulation
 
         grille_live.one_step_simulation()
+
         # pourcentage de progression
         if int(math.floor((grille_live.step_simulation) / grille_solution.step_simulation * 1000)) \
                 > int(math.floor((grille_live.step_simulation - 1) / grille_solution.step_simulation * 1000)):
+            #pourcentage d'avancement de la simulation
             pourcentage = (1000 - int(
                 math.floor((grille_live.step_simulation - 1) / grille_solution.step_simulation * 1000))) / 10
+
+            #temps estimé pour la simulation
             temps_estime = math.floor((os.times()[0] - stated_time) / (pourcentage + 0.000000001) * (100 - pourcentage))
+
+            #points gagnés
             total_point_en_cours = 0
+
+            #tache à réaliser
             total_tache_restante = len(grille_live.taches)
+
             for robot in grille_live.robots:
                 for tache in robot.taches:
                     total_tache_restante += 1
@@ -491,9 +468,9 @@ def methode_naive(
                       total_point_en_cours, " points en cours")
             if affichage_graphique:
                 debug_canvas.update()
-        # print(grille_live)
 
-
+###################################################################################################
+# Fin de la simulation
 
     # supprime les tâches non finies
     for index_robot in range(len(grille_live.robots)):
@@ -510,7 +487,7 @@ def ccw(A: ItemCase, B: ItemCase, C: ItemCase):
     return (C.y - A.y) * (B.x - A.x) > (B.y - A.y) * (C.x - A.x)
 
 
-# Return true if line segments AB and CD intersect
+# Retourne True si les segments AB et CD s'intersectent
 def intersect(A: ItemCase, B: ItemCase, C: ItemCase, D: ItemCase):
     return ccw(A, C, D) != ccw(B, C, D) and ccw(A, B, C) != ccw(A, B, D)
 

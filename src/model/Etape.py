@@ -2,7 +2,7 @@ from src.model.ItemCase import ItemCase
 
 
 class Etape(ItemCase):
-    """Une étape d'une Tâche"""
+    """Etape : Une étape d'une Tâche"""
 
     # le temps estimer pour aller à cette etape (en effectuant la tâche)
     # utilisé par le simulateur

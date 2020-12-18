@@ -1,26 +1,26 @@
+import argparse
 import os
 import random
-from threading import Thread
 
 from src import resolv
 from src.model.ExportOutput import ExportOutput
 from src.model.Grille import Grille
-from src.model.ItemCase import ItemCase
-
 from src.model.ParseInput import ParseInput
-
-import argparse
-
-# class th(Thread):
-#     def __init__(self, best):
-#         self.best = best
-#         super ().__init__ ()
-#
-#     def run(self) -> None:
 from src.model.TypeMap import TypeMap
 
 
 def required_length(nmin,nmax, sort: bool = False):
+    """Fonction donnant le nombre d'arguments min et max
+
+    :param nmin: nombre min d'arguments
+    :type: int
+
+    :param nmax: nombre max d'arguments
+    :type: int
+
+    :param sort:
+    :type: bool
+    """
     class RequiredLength(argparse.Action):
         def __call__(self, parser, args, values, option_string=None):
             if not nmin<=len(values)<=nmax:
@@ -49,6 +49,7 @@ def required_length_in(ns, sort: bool = False):
 
 
 def param_from_arg(args_dic: dict, param_name: str, nb_value: int, map_chose: TypeMap, type):
+    """Retourne une valeur en fonction des arguments donnée du cli et des paramètres par défauts"""
     params = {
         TypeMap.C: {'MAX_STUCK': 10,
                     'MAX_DIST_PM': random.randint (150, 400),
@@ -71,6 +72,7 @@ def param_from_arg(args_dic: dict, param_name: str, nb_value: int, map_chose: Ty
     }
     param = 0
 
+    # set param en fonction des options
     if args_dic[param_name] is not None and len (args_dic[param_name]) > 0:
         if len (args_dic[param_name]) == 1 or (len (args_dic[param_name]) == 2 and nb_value == 1):
             if type == int:
@@ -94,6 +96,7 @@ def param_from_arg(args_dic: dict, param_name: str, nb_value: int, map_chose: Ty
         if map_chose in params:
             param = params[map_chose][param_name]
         else:
+
             raise argparse.ArgumentTypeError (
                 f"argument --{param_name} must be given with at less {nb_value} value for map {map_chose.name}")
 
@@ -103,11 +106,13 @@ def param_from_arg(args_dic: dict, param_name: str, nb_value: int, map_chose: Ty
 
 
 if __name__ == "__main__":
+    # options choisies
     my_parser = argparse.ArgumentParser (
         description='Retourne des solutions pour le polyhash 2020.'
                     ''
     )
 
+    # toutes les arguments que supporte le cli
     my_parser.add_argument ('-m', '--map',
                             choices=['A', 'B', 'C', 'D', 'E', 'F'],
                             help='choix de la carte',
@@ -171,7 +176,7 @@ if __name__ == "__main__":
     ADDITION: tuple
     FACTEUR_CONCENTRATION_BRAS: float
 
-    # récap
+    # récapitulatif de nos options
     print ('Paramètres de la simulation:')
     print ('Map :', map_chose.name)
     print ('Nombre d\'itération :', iteration)
@@ -201,7 +206,7 @@ if __name__ == "__main__":
             ADDITION = param_from_arg(args_dic, 'ADDITION', 4, map_chose, float)
             FACTEUR_CONCENTRATION_BRAS = param_from_arg(args_dic, 'FACTEUR_CONCENTRATION_BRAS', 1, map_chose, float)
 
-
+            # afficher les paramètre de la recherche d'une solution en cours
             print(f'  MAX_STUCK = {MAX_STUCK}')
             print(f'  MAX_DIST_PM = {MAX_DIST_PM}')
             print(f'  ADDITION = {ADDITION}')
@@ -210,6 +215,7 @@ if __name__ == "__main__":
                                                    affichage_graphique=affichage_graphique, affichage_console=affichage_console)
             print(i," points: ", grille_solution.points//1000, " K, ADDITION: ", ADDITION, ", MAX_STUCK: ", MAX_STUCK)
 
+            # Comparaison entre les nouveaux points trouvés et les points de la solution précédente
             if grille_solution.points > best[1]:
                 best[1] = grille_solution.points
                 best[0] = grille_solution

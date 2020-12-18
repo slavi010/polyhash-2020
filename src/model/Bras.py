@@ -2,7 +2,7 @@ from src.model.ItemCase import ItemCase
 
 
 class Bras(ItemCase):
-    """Un morceau de bras d'un robot"""
+    """Bras : Un morceau de bras d'un robot"""
 
     def __init__(self, x: int, y: int):
         """

@@ -2,7 +2,7 @@ from src.model.Mouvement import Mouvement
 
 
 class ItemCase:
-    """Un élément dans la grille"""
+    """ItemCase : Un élément dans la grille"""
 
     x: int
     y: int
@@ -46,7 +46,7 @@ class ItemCase:
                 raise ValueError("Mouvement non reconnu !")
 
     def __eq__(self, other):
-        """Retourne vrai si cette instance et other sont à la même place dans la même grille
+        """ Retourne vrai si cette instance et other sont à la même place dans la même grille
 
             :param other: l'instance avec qui comparer
             :rtype: bool
@@ -56,7 +56,7 @@ class ItemCase:
             self.y == other.y
 
     def __ne__(self, other):
-        """Retourne vrai si cette instance et other ne sont pas à la même place dans la même grille
+        """ Retourne vrai si cette instance et other ne sont pas à la même place dans la même grille
 
             :param other: l'instance avec qui comparer
             :rtype: bool
@@ -64,18 +64,14 @@ class ItemCase:
         return not self == other
 
     def distance(self, other):
-        """Calcule la distance entre cet objet et other à vol d'oiseaux
-
-        TODO tests
+        """ Calcule la distance de Manhattan entre cet objet et other
         """
         assert other is not None
 
         return abs(self.x - other.x) + abs(self.y - other.y)
 
     def surface(self, other):
-        """Calcule la surface entre cette objet et other en un rectangle
-
-        TODO tests
+        """ Calcule la surface entre cette objet et other en un rectangle
         """
         assert other is not None
 

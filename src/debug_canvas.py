@@ -1,6 +1,8 @@
 # For drawing
 import tkinter as tk
+
 from PIL import ImageTk, Image, ImageDraw
+
 # My stuff (not yours...)
 from src.model.Grille import Grille
 from src.model.ItemCase import ItemCase
@@ -10,6 +12,9 @@ from src.model.Tache import Tache
 
 
 class DebugCanvas:
+    """
+    DebugCanvas : affichage graphique
+    """
     def __init__(self, grille: Grille, cells_size: int=3):
         self.cpt: int = 0
         self.grille: Grille = grille

@@ -1,4 +1,4 @@
-# PolyHash 2020
+un# PolyHash 2020
 ============
 
 Pour ce projet, nous avons cherché à résoudre le problème posé lors du Google hash code de 2020.

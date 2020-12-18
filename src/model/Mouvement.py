@@ -2,7 +2,9 @@ from enum import Enum
 
 
 class Mouvement(Enum):
-    """Le mouvement d'un robot"""
+    """Le mouvement d'un robot, un robot peut faire 5 types de mouvements différents
+    
+    """
     HAUT = "U"
     DROITE = "R"
     BAS = "D"
@@ -13,7 +15,7 @@ class Mouvement(Enum):
         return self.value
 
     def rotation_90(self, multiplicateur: int = 1):
-        """Retourne le mouvement après rotation a 90° dans le sens horaire
+        """Retourne le mouvement correspondant après un certain nombre de rotations a 90° dans le sens horaire
 
         Exemple :
             Si mouvement = HAUT et multiplicateur = 1 alors retourne DROITE
@@ -25,6 +27,7 @@ class Mouvement(Enum):
 
         mouvement = self
 
+        # en fonction de la position, déplacement à 90° dans le sens horaire
         for i in range(multiplicateur):
             if mouvement == Mouvement.HAUT:
                 mouvement = Mouvement.DROITE

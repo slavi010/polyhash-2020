@@ -1,5 +1,5 @@
 import heapq
-from typing import List, Union
+from typing import List
 
 from src.model.Bras import Bras
 from src.model.Etape import Etape

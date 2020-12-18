@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from setuptools import setup
-import unittest
 
 # src : https://docs.python.org/3/distutils/setupscript.html
 setup(
