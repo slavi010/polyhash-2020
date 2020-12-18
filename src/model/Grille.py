@@ -11,21 +11,31 @@ from src.model.Tache import Tache
 
 class Grille:
     """La grille
+    Il s'agit de la représentation de la grille dans laquelle les robots évoluent
+    C'est au sein de la grille qu'a lieu la simulation, c'est-à-dire les différentes solutions sont ici testée
 
     """
 
+    # Taille de la grille
     longueur: int
     hauteur: int
 
+    # Etape dans la simulation
     step_simulation: int = 0
 
     # cases[y][x] : y est la hauteur et x la largeur
     cases: List
 
+    # Liste des robots associés à la grille
     robots: List
+
+    # Liste des tâches associées à la grille
     taches: List
+
+    # Liste des points de montage dans la grille
     point_montages: List
 
+    # Nombre de points gagnés
     points: int
 
     def __init__(self, longueur: int, hauteur: int):
@@ -53,6 +63,7 @@ class Grille:
         Doit vérifier que les robots ont finis toutes leurs taches et mouvements.
         """
 
+        # Tant qu'il reste du temps pour réaliser la simulation, on continue
         while self.step_simulation > 0:
             self.one_step_simulation()
 
@@ -74,8 +85,11 @@ class Grille:
         Si une tâche n'a plus d'étape, ajoute les points de la tâche et supprime la tâche du robot.
 
         """
+
+        # Si il n'y a plus de temps pour réaliser la simulation -> Erreur
         if not self.step_simulation:
             raise ValueError("La simulation est finie !")
+        # Lorsque on réalise une étape de la simulation, le temps restant avant la fin diminue
         self.step_simulation -= 1
 
         # vérifie si chaque robot a au moins un mouvement
@@ -83,7 +97,9 @@ class Grille:
             if not len(robot.mouvements):
                 raise AttributeError("Un robot n'a pas de prochain mouvement !")
 
+        # on copie tous les robots
         robots = self.robots.copy()
+
         # fait bouger chaque robot avec des mouvements de rétractation
         for robot in self.robots:
             if robot.faire_prochain_mouvement_retractation(self):
@@ -118,11 +134,13 @@ class Grille:
         :param point_montage: Le point de montage à ajouter
         :return: Grille
         """
-
+        # On ne peux pas ajouter un point de montage vide (vérification en cas d'erreurs de données)
         assert point_montage is not None
+
         # vérifier si la case est vide
         assert len(self.cases[point_montage.y][point_montage.x]) == 0
 
+        # ajoute le point de montage à la grille ainqi qu'à la liste des points de montage
         self.cases[point_montage.y][point_montage.x].append(point_montage)
         self.point_montages.append(point_montage)
 
@@ -136,24 +154,29 @@ class Grille:
         ne rien faire.
 
         :param tache: La tache à ajouter
+        :type: Tache
+
         :return: Grille
         """
-
+        # on ne peut pas ajouter de tâches vides (vérification en cas d'erreurs dans les données)
         assert tache is not None
         assert len(tache.etapes) > 0
 
+        #on parcourt toutes les étapes de la tâche en question
         for etape in tache.etapes:
             deja_etape = False
             for item in self.cases[etape.y][etape.x]:
                 # si il y a un point de montage alors error
                 if isinstance(item, PointMontage):
                     raise ValueError("Il ya déjà un point de montage à la case, ajout de l'étape impossible")
-                # si il n'y a pas déjà d'étapes dans la case alors on l'ajoute
+                # si il y a déjà une étape dans la case, on passe
                 elif isinstance(item, Etape):
                     deja_etape = True
+            # si il n'y a pas déjà d'étapes dans la case alors on l'ajoute
             if not deja_etape:
                 self.cases[etape.y][etape.x].append(etape)
 
+        # on rajoute la tâche à la liste des tâches de la grille
         self.taches.append(tache)
 
         return self
@@ -162,12 +185,22 @@ class Grille:
         """Renvoie la grille sous forme d'une matrice.
 
         0 pour un point de montage
-        -1 pour un bras d'autre robots (avec ou sons etape)
+        -1 pour un bras d'autre robots (avec ou sans etape)
         1 pour les bras du robot actuel (si lieu)
         100 pour le vide
         150 pour une etape
 
         :param robot: Le point de vue du robot actuel (notamment pour la rétractation)
+        :type: Robot
+
+        :param x1: coordonée x
+        :param y1: coordonée y
+        :type: int
+
+        :param x2: coordonée x
+        :param y2: coordonée y
+        :type: int
+
         :return : La carte en deux dimenssions
         :rtype : List
         """
@@ -231,6 +264,7 @@ class Grille:
         :return : La carte en deux dimenssions
         :rtype : str
         """
+
         map: str = ""
         for y in range(self.hauteur-1, -1, -1):
             map += str(y) + '\t'
@@ -238,15 +272,19 @@ class Grille:
                 if idx % 10 == 0:
                     map += " "
                 if len(self.cases[y][x]) == 1:
+                    #si la case est un point de montage, ceux-ci sont représenté par des O
                     if isinstance(self.cases[y][x][0], PointMontage):
                         map += "O"
+                    # si la case est un bras de robot, ceux-ci sont représenté par des B
                     elif isinstance(self.cases[y][x][0], Bras):
                         map += "B"
+                    # si la case est une Etape, ceux-ci sont représenté par des x
                     elif isinstance(self.cases[y][x][0], Etape):
                         map += "x"
                 elif len(self.cases[y][x]) == 2:
                     map += "#"
                 else:
+                    #case vide
                     map += "."
             map += "\n"
         return map
@@ -256,8 +294,33 @@ class Grille:
                    bras_robot: List,
                    carte: List,
                    x_offset: int,
-                   y_offset: int):
+                   y_offset: int) -> List:
 
+        """" Algorithme du plus court chemin
+
+        :param depart: case de départ de l'algorithme
+        :type: ItemCase
+
+        :param arrivee: case d'arrivée
+        :type: Etape
+
+        :param bras_robot: liste des cases occupées par le robot
+        :type: List
+
+        :param carte: la grille sous forme de liste
+        :type: List
+
+        :param x_offset: permet d'avoir les coordonées relatives d'une case
+        :type: int
+
+        :param y_offset: permet d'avoir les coordonées relatives d'une case
+        :type: int
+
+        :return: le chemin sous forme de liste des cases à traversées
+        :rtype: List
+        """
+
+        #coordonées de départ et d'arrivée
         depart_coord = (depart.x, depart.y)
         arrivee_coord = (arrivee.x, arrivee.y)
 
