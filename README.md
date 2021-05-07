@@ -3,16 +3,20 @@
 
 Dans le cadre d'un cours de programmation en python (bac +3, formation d'ingénieur en informatique) à Polytech Nantes.
 
-Pour ce projet, nous avons cherché à résoudre le problème posé lors du Google hash code de 2020.
+Pour ce projet, nous avons cherché à résoudre le problème posé lors du Google hash code de 2020 [wiki/introduction](https://github.com/slavi010/polyhash-2020/wiki/Introduction).
 
-Notre solution apporte plus de 7,1 millions de points (sans limite de temps de programmation).
+Notre solution apporte plus de 7 millions de points (sans limite de temps de programmation) [wiki/score-final](https://github.com/slavi010/polyhash-2020/blob/master/image_readme/Score_totaux.png).
 
 # Notre équipe
 ===========
 * Sviatoslav BESNARD (**pro@slavi.dev**)
 * Aurelie BOULAIS
-* Chama EL MAJENY
+* Chama EL MAJENY (chama.elmajeny@gmail.com)
 * Remy BORIUS
+
+# Notre Wiki
+
+[WIKI ICI](https://github.com/slavi010/polyhash-2020/wiki)
 
 # Quick start
 Pour lancer une recherche de solution sur la carte A (ou fichier d'input A) lancez :
@@ -59,3 +63,9 @@ Attention ! L'affichage de cette interface va diminuer de manière drastique la 
 
 ![Image de l'interface graphique](https://uncloud.univ-nantes.fr/index.php/s/NJrBcn5TdfjrzkP/preview)
 
+# Contact
+pro@slavi.dev
+
+et
+
+chama.elmajeny@gmail.com
