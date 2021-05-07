@@ -1,11 +1,15 @@
-un# PolyHash 2020
+# PolyHash 2020 (imported from Gitlab)
 ============
+
+Dans le cadre d'un cours de programmation en python (bac +3, formation d'ingénieur en informatique) à Polytech Nantes.
 
 Pour ce projet, nous avons cherché à résoudre le problème posé lors du Google hash code de 2020.
 
+Notre solution apporte plus de 7,1 millions de points (sans limite de temps de programmation).
+
 # Notre équipe
 ===========
-* Sviatoslav BESNARD
+* Sviatoslav BESNARD (**pro@slavi.dev**)
 * Aurelie BOULAIS
 * Chama EL MAJENY
 * Remy BORIUS
